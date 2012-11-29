@@ -84,7 +84,7 @@ bonk_interrupt:
       j       interrupt_dispatch       # see if other interrupts are waiting
 
 
-scan_interrupt:				
+scan_interrupt:				#start scanning
 	
 	li     $t0, 150			#set scan coordinates
 	sw     $t0, 0xffff0020
