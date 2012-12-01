@@ -1,0 +1,10 @@
+[Information about SpimBot]
+
+Main function:
+In the QtSpim/main.ccp calls Robots.h library and spimbotview.h. This file is most likely the main function which simulates our code.
+
+[Memory Locations]
+
+
+
+[Scanner Functions]
