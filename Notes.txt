@@ -8,3 +8,7 @@ In the QtSpim/main.ccp calls Robots.h library and spimbotview.h. This file is mo
 
 
 [Scanner Functions]
+
+
+
+[Optimizations]

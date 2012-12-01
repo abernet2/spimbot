@@ -95,7 +95,7 @@ bonk_interrupt:
       sw      $a1, 0xffff0060($zero)   # acknowledge interrupt
 
       li      $v0, 4
-      la      $a0, scanner_intrpt_str
+      la      $a0, bonk_intrpt_str
       syscall			       #print interrupt handler
 
       j       interrupt_dispatch       # see if other interrupts are waiting
@@ -104,7 +104,7 @@ timer_interrupt:
       sw      $a1, 0xffff006c($zero)   # acknowledge interrupt
 
       li      $v0, 4
-      la      $a0, scanner_intrpt_str
+      la      $a0, timer_intrpt_str
       syscall			       #print interrupt handler
 
       j       interrupt_dispatch       # see if other interrupts are waiting
@@ -117,7 +117,7 @@ scanner_interrupt:
       syscall			       #print interrupt handler
 
       
-      //j	      print_registers
+      j	      print_registers
 done_printing:
 
       j	      interrupt_dispatch
