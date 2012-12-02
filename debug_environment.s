@@ -1,8 +1,12 @@
+# -----------------------------------------------------------------
+# This is the SpimBot program created by Jack Abernethy, John McConnell, and Brian Xue.
+#------------------------------------------------------------------
+
 .data
 index:	.word 0
 state: 	.word 0
 output: .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   # output array, 15 x 32 bits 0f 0
-scan_data: .space 16384
+scan_data: .space 16384 		# Memory allocation for scan data
 
 .text
 main:
@@ -24,36 +28,67 @@ infinite:
 # ---------------------------------------------------------------------
 
 initialize:
-     li     $t4, 0xb001                # Or(timer, bonk, scan, global)
+     	li	$t4, 0xb001                # Or(timer, bonk, scan, global)
 
-     mtc0   $t4, $12                   # set interrupt mask (Status register)
+     	mtc0   	$t4, $12                   # set interrupt mask (Status register)
      
                                        # REQUEST TIMER INTERRUPT
-     lw     $v0, 0xffff001c($0)        # read current time
-     add    $v0, $v0, 100	       # add 100 to current time
-     sw     $v0, 0xffff001c($0)        # request timer interrupt in 100000 cycles
+     	lw     	$v0, 0xffff001c($0)        # read current time
+     	add    	$v0, $v0, 100	       # add 100 to current time
+     	sw     	$v0, 0xffff001c($0)        # request timer interrupt in 100000 cycles
 
-      li      $t0, 0x96		       # this is performing a scan
-      sw      $t0, 0xffff0050($zero)
-      sw      $t0, 0xffff0054($zero)
-      li      $t0, 0xd4
-      sw      $t0, 0xffff0058($zero)
-      la      $t0, scan_data
-      sw      $t0, 0xffff005c($zero)  
-
+      	li      $t0, 0x96		       # this is performing a scan
+      	sw      $t0, 0xffff0050($zero)
+      	sw      $t0, 0xffff0054($zero)
+      	li      $t0, 0xd4
+      	sw      $t0, 0xffff0058($zero)
+      	la      $t0, scan_data
+     	sw      $t0, 0xffff005c($zero)  
 
 	jr	$ra
 
-.kdata                # interrupt handler data (separated just for readability)
-chunkIH:.space 20      # space for 3 registers
-newline:	  .asciiz "\n"
-done_str:	  .asciiz "done with task\n"
-print_reg_str:	  .asciiz "Printing registers...\n"
-timer_intrpt_str: .asciiz "time interrupt exception\n"
+.kdata                 # interrupt handler data (separated just for readability)
+chunkIH:.space 28      # space for 3 registers
+
+#-----------------------------------------------------------
+# This section is dedicated for strings to be printed by syscall
+# the labels used are defined below
+newline:	  	.asciiz "\n"
+begin_str:		.asciiz "beginning task\n"
+done_str:	  	.asciiz "done with task\n"
+print_reg_v1_str:	.asciiz "Printing register v1: "
+print_reg_a1_str:	.asciiz "Printing register a1: "
+print_reg_a2_str:	.asciiz "Printing register a2: "
+print_reg_a3_str:	.asciiz "Printing register a3: "
+print_reg_t0_str:	.asciiz "Printing register t0: "
+print_reg_t1_str:	.asciiz "Printing register t1: "
+print_reg_t2_str:	.asciiz "Printing register t2: "
+print_reg_t3_str:	.asciiz "Printing register t3: "
+print_reg_t4_str:	.asciiz "Printing register t4: "
+print_reg_t5_str:	.asciiz "Printing register t5: "
+print_reg_t6_str:	.asciiz "Printing register t6: "
+print_reg_t7_str:	.asciiz "Printing register t7: "
+print_reg_t8_str:	.asciiz "Printing register t8: "
+print_reg_t9_str:	.asciiz "Printing register t9: "
+print_reg_s0_str:	.asciiz "Printing register s0: "
+print_reg_s1_str:	.asciiz "Printing register s1: "
+print_reg_s2_str:	.asciiz "Printing register s2: "
+print_reg_s3_str:	.asciiz "Printing register s3: "
+print_reg_s4_str:	.asciiz "Printing register s4: "
+print_reg_s5_str:	.asciiz "Printing register s5: "
+print_reg_s6_str: 	.asciiz "Printing register s6: "
+print_reg_s7_str:	.asciiz "Printing register s7: "
+print_reg_gp_str:	.asciiz "Printing global pointer register: "
+print_reg_sp_str:	.asciiz "Printing stack pointer register: "
+print_reg_fp_str:	.asciiz "Printing frame pointer register: "
+print_reg_ra_str:	.asciiz "Printing return address pointe: "
+timer_intrpt_str: 	.asciiz "time interrupt exception\n"
 scanner_intrpt_str:	.asciiz "scanner interrupt exception\n"
-bonk_intrpt_str:	  .asciiz "bonk interrupt exception\n"
-non_intrpt_str:   .asciiz "Non-interrupt exception\n"
-unhandled_str:    .asciiz "Unhandled interrupt type\n"
+bonk_intrpt_str:	.asciiz "bonk interrupt exception\n"
+non_intrpt_str:   	.asciiz "Non-interrupt exception\n"
+unhandled_str:    	.asciiz "Unhandled interrupt type\n"
+# End of string sections
+#----------------------------------------------------------
 
 
 .ktext 0x80000180
@@ -73,7 +108,9 @@ interrupt_handler:
 
 interrupt_dispatch:                    # Interrupt:                             
       mfc0    $k0, $13                 # Get Cause register, again                 
-      beq     $k0, $zero, done         # handled all outstanding interrupts     
+      beq     $k0, $zero, done         # handled all outstanding interrupts    
+
+      				       # add dispatch for other interrupt types here.
   
       and     $a0, $k0, 0x1000         # is there a bonk interrupt?                
       bne     $a0, 0, bonk_interrupt   
@@ -84,7 +121,6 @@ interrupt_dispatch:                    # Interrupt:
       and     $a0, $k0, 0x8000         # is there a timer interrupt?
       bne     $a0, 0, timer_interrupt
 
-                         # add dispatch for other interrupt types here.
 
       li      $v0, 4                   # Unhandled interrupt types
 
@@ -111,25 +147,21 @@ timer_interrupt:
       j       interrupt_dispatch       # see if other interrupts are waiting
 
 scanner_interrupt:
-      sw      $a1, 0xffff0064($zero)   # acknowledge interrupt
+      	sw      $a1, 0xffff0064($zero)   # acknowledge interrupt
       
-      li      $v0, 4
-      la      $a0, scanner_intrpt_str
-      syscall			       # print interrupt handler
+      	li      $v0, 4
+      	la      $a0, scanner_intrpt_str
+      	syscall			       # print interrupt handler
 
-      sw      $ra, 12($k0)             # storing return register
+      	#sw      $ra, 12($k0)             # storing return register
       
-      li      $v0, 4
-      la      $a0, scan_data	       # print scan data address
-      syscall
+      	la      $a0, scan_data	       # print scan data address
+      	jal	print_register
 
-      jal     sort_and_extract	       # sort and extract
-      lw      $ra, 12($k0)	       # load return register
-      
-      j	      print_registers
-done_printing:
+      	#jal     sort_and_extract	       # sort and extract
+     	#lw      $ra, 12($k0)	       # load return register
 
-      j	      interrupt_dispatch
+      	j	interrupt_dispatch
 
 non_intrpt:                            # was some non-interrupt
       li      $v0, 4
@@ -151,162 +183,36 @@ done:
       jr      $k0
       nop
 
-print_registers:
-      li      $v0, 4
-      la      $a0, print_reg_str
-      syscall
-
-      li      $v0, 1
-      move    $a0, $v1
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $a1
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $a2
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $a3
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $t0
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $t1
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $t2
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $t3
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $t4
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $t5
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $t6
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $t7
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $t8
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $t9
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $s1
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $s2
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $s3
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $s4
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $s5
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $s6
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 1
-      move    $a0, $s7
-      syscall  
-      li      $v0, 4
-      la      $a0, newline
-      syscall
-
-      li      $v0, 4
-      la      $a0, done_str
-      syscall
-j     done_printing
+# -----------------------------------------------------------------
+# This is the beginning of the sort and extract function
+# Author: Jack Abernethy
+# The labels used in the section include:
+# 	sort_and_extract
+# 	big_for_loop
+# 	end_big_loop
+# 	insert_after_element
+# 	iea_after_head
+# 	iea_done
+# 	iea_not_head
+# 	iea_not_tail
+# 	remove_element
+#	re_empty_list
+#	re_not_empty_list
+#	re_not_first
+#	re_not_last
+#	re_done
+#	sort_list
+#	sl_2_or_more
+#	sl_loop
+#	sl_skip
+#	sl_loop_done
+#	compact
+#	compact_loop
+#	compact_else_case
+#	compact_endif
+#	compact_loop_maintainance
+#	compact_done
+# -----------------------------------------------------------------
 
 # args(listhead, output array head?);
 #	$a0 == listhead
@@ -511,3 +417,404 @@ compact_loop_maintainance:
 compact_done:
   jr   $ra              # return
 
+# ----------------------------------------------------------
+# This is the end of the sort and extract function
+# ----------------------------------------------------------
+
+
+# ----------------------------------------------------------
+# This next section is dedicated to the functions that belong to the debug environment
+# Author: John McConnell
+# The labels used in this section include
+#	print_all_registers
+#	print_register
+#	print_register_v1
+#	print_register_a1
+#	print_register_a2
+#	print_register_a3
+#	print_register_t0
+#	print_register_t1
+#	print_register_t2
+#	print_register_t3
+#	print_register_t4
+#	print_register_t5
+#	print_register_t6
+#	print_register_t7
+#	print_register_t8
+#	print_register_t9
+#	print_register_s0
+#	print_register_s1
+#	print_register_s2
+#	print_register_s3
+#	print_register_s4
+#	print_register_s5
+#	print_register_s6
+#	print_register_s7
+# It should be noted that registers $a0 and $v0 are not included because they will
+# have to be overwritten in order to be used in syscall
+# ----------------------------------------------------------	
+print_all_registers:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+	jal 	print_register_v1
+	jal	print_register_a1
+	jal	print_register_a2
+	jal	print_register_a3
+	jal	print_register_t0
+	jal	print_register_t1
+	jal	print_register_t2
+	jal	print_register_t3
+	jal	print_register_t4
+	jal	print_register_t5
+	jal	print_register_t6
+	jal	print_register_t7
+	jal	print_register_t8
+	jal	print_register_t9
+	jal	print_register_s0
+	jal	print_register_s1
+	jal	print_register_s2
+	jal	print_register_s3
+	jal	print_register_s4
+	jal	print_register_s5
+	jal	print_register_s6
+	jal	print_register_s7
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register:
+      	li      $v0, 1		# Printer register as int
+      	syscall			# Prints value in $a0
+
+      	li      $v0, 4
+      	la      $a0, newline	# Print a new line
+	syscall
+	jr	$ra
+
+print_register_v1:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li	$v0, 4		# Print introductory string
+      	la      $a0, print_reg_v1_str
+      	syscall
+	move	$a0, $v1
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_a1:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li	$v0, 4		# Print introductory string
+      	la      $a0, print_reg_a1_str
+      	syscall
+
+      	move    $a0, $a1
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_a2:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li	$v0, 4		# Print introductory string
+      	la      $a0, print_reg_a2_str
+      	syscall
+
+      	move    $a0, $a2
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_a3:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+	li	$v0, 4
+	la	$a0, print_reg_a3_str
+	syscall
+
+      	move    $a0, $a3
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+print_register_t0:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_t0_str
+      	syscall
+
+      	move    $a0, $t0
+     	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_t1:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_t1_str
+      	syscall
+
+     	move    $a0, $t1
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_t2:  
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_t2_str
+      	syscall
+
+      	move    $a0, $t2
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_t3:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_t3_str
+      	syscall
+
+      	move    $a0, $t3
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_t4: 
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_t4_str
+      	syscall
+
+      	move    $a0, $t4
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_t5:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_t5_str
+      	syscall
+
+      	move    $a0, $t5
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_t6:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_t6_str
+      	syscall
+
+     	move    $a0, $t6
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_t7:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_t7_str
+      	syscall
+
+      	move    $a0, $t7
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_t8:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_t8_str
+      	syscall
+
+      	move    $a0, $t8
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_t9:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_t9_str
+      	syscall
+
+      	move    $a0, $t9
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_s0:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_s0_str
+      	syscall
+
+      	move    $a0, $s0
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_s1:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+     	la      $a0, print_reg_s1_str
+      	syscall
+
+     	move    $a0, $s1
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_s2:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_s2_str
+     	syscall
+
+      	move    $a0, $s2
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra 
+
+print_register_s3:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_s3_str
+      	syscall
+
+      	move    $a0, $s3
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_s4:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_s4_str
+      	syscall
+
+     	 move    $a0, $s4
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_s5:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_s5_str
+      	syscall
+
+      	move    $a0, $s5
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_s6:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_s6_str
+      	syscall
+
+      	move    $a0, $s6
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register_s7:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+
+      	li      $v0, 4
+      	la      $a0, print_reg_s7_str
+      	syscall
+
+      	move    $a0, $s7
+	jal	print_register
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
