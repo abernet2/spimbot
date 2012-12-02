@@ -8,6 +8,18 @@ state: 	.word 0
 output: .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   # output array, 15 x 32 bits 0f 0
 scan_data: .space 16384 		# Memory allocation for scan data
 
+# euclidean stuff
+three:	.float	3.0
+five:	.float	5.0
+PI:	.float	3.14159
+F180:	.float  180.0
+
+ystring:
+	.word	30	52	30	5	-2	170	-35	0
+xstring:
+	.word	60	30	-30	-30	-30	30	30	30
+
+
 .text
 main:
 	sw	$zero,  0xffff0010($0)	#stop the bot
@@ -138,13 +150,58 @@ bonk_interrupt:
       j       interrupt_dispatch       # see if other interrupts are waiting
 
 timer_interrupt:
-      sw      $a1, 0xffff006c($zero)   # acknowledge interrupt
+      	sw      $a1, 0xffff006c($zero)   # acknowledge interrupt
 
-      li      $v0, 4
-      la      $a0, timer_intrpt_str
-      syscall			       #print interrupt handler
+      	li      $v0, 4
+      	la      $a0, timer_intrpt_str
+      	syscall			       #print interrupt handler
 
-      j       interrupt_dispatch       # see if other interrupts are waiting
+	sub     $sp, $sp, 4
+      	sw      $v0, 0($sp)
+
+	lw     	$t0, 0xffff0020($zero)   #get_current_x()
+	lw     	$t1, 0xffff0024($zero)   #get_current_y()
+
+	la	$t2, xstring
+	add	$t2, $t2, 20		#should get sixth word in xstring
+	lw	$s0, 0($t2)		#load x
+	
+	la	$t2, ystring
+	add	$t2, $t2, 20		#should get sixth word in ystring
+	lw	$s1, 0($t2)		#load y
+
+	sub     $s0, $s0, $t0	       	#get difference in distance from curr_x to token
+	sub     $s1, $s1, $t1	       	#get difference in distance from curr_y to token
+	sub	$sp, $sp, 20
+	sw	$ra, 0($sp)		# save return address on stack
+	sw      $t0, 4($sp)		#saved t0 to stack
+	sw      $a0, 8($sp)
+	sw      $a1, 12($sp)		#save a0, a1 to stack
+	sw      $t1, 16($sp)		#saved t1 to stack
+
+	move	$a0, $s0	    	#get the angle
+	move	$a1, $s1
+	jal	sb_arctan
+	
+	lw	$ra, 0($sp)		# restore return address on stack
+	lw      $t0, 4($sp)		#restore t0 from stack
+	lw      $a0, 8($sp)
+	lw      $a1, 12($sp)		#restore a0, a1 from stack
+	lw      $t1, 16($sp)		#restore t1 from stack
+	add	$sp, $sp, 20
+
+	li     	$t4, 10	
+	sw     	$t4, 0xffff0010($zero)	#set velocity to 10
+
+	sw     	$v0, 0xffff0014($zero)   #set angle to new_angle
+	li     	$t4, 1
+	sw     	$t4, 0xffff0018($zero)	#set orientation control = 1
+
+	lw     	$v0, 0($sp)
+	add	$sp, $sp, 4
+	li	$t8, 0xffffffff
+	#sw     	$t8, 0xffff001c($zero)	#request time interrupt
+	j      interrupt_dispatch	# see if other interrupts are waiting
 
 scanner_interrupt:
       	sw      $a1, 0xffff0064($zero)   # acknowledge interrupt
@@ -818,3 +875,57 @@ print_register_s7:
 	lw	$ra, 0($sp)
 	add	$sp, $sp, 4
 	jr	$ra
+
+# ----------------------------------------------------------------
+# Arctan function - Part of the Euclidean Library
+# Labels used include:
+#
+# ----------------------------------------------------------------
+sb_arctan:
+	li	$v0, 0		# angle = 0;
+
+	abs	$t0, $a0	# get absolute values
+	abs	$t1, $a1
+	ble	$t1, $t0, no_TURN_90	  
+
+	## if (abs(y) > abs(x)) { rotate 90 degrees }
+	move	$t0, $a1	# int temp = y;
+	sub	$a1, $zero, $a0	# y = -x;      
+	move	$a0, $t0	# x = temp;    
+	li	$v0, 90		# angle = 90;  
+
+no_TURN_90:
+	bge	$a0, $zero, pos_x 	# skip if (x >= 0)
+
+	## if (x < 0) 
+	add	$v0, $v0, 180	# angle += 180;
+
+pos_x:
+	mtc1	$a0, $f0
+	mtc1	$a1, $f1
+	cvt.s.w $f0, $f0	# convert from ints to floats
+	cvt.s.w $f1, $f1
+	
+	div.s	$f0, $f1, $f0	# float v = (float) y / (float) x;
+
+	mul.s	$f1, $f0, $f0	# v^^2
+	mul.s	$f2, $f1, $f0	# v^^3
+	l.s	$f3, three($zero)	# load 5.0
+	div.s 	$f3, $f2, $f3	# v^^3/3
+	sub.s	$f6, $f0, $f3	# v - v^^3/3
+
+	mul.s	$f4, $f1, $f2	# v^^5
+	l.s	$f5, five($zero)	# load 3.0
+	div.s 	$f5, $f4, $f5	# v^^5/5
+	add.s	$f6, $f6, $f5	# value = v - v^^3/3 + v^^5/5
+
+	l.s	$f8, PI($zero)		# load PI
+	div.s	$f6, $f6, $f8	# value / PI
+	l.s	$f7, F180($zero)	# load 180.0
+	mul.s	$f6, $f6, $f7	# 180.0 * value / PI
+
+	cvt.w.s $f6, $f6	# convert "delta" back to integer
+	mfc1	$t0, $f6
+	add	$v0, $v0, $t0	# angle += delta
+
+	jr 	$ra
