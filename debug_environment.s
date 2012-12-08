@@ -60,7 +60,7 @@ initialize:
 	jr	$ra
 
 .kdata                 # interrupt handler data (separated just for readability)
-chunkIH:.space 28      # space for 3 registers
+chunkIH:.space 40      # space for 3 registers
 
 #-----------------------------------------------------------
 # This section is dedicated for strings to be printed by syscall
@@ -214,12 +214,10 @@ scanner_interrupt:
       	la      $a0, scan_data	          # print scan data address
 
       	jal     sort_and_extract	       # sort and extract
-	move	$t3, $v0
-	jal	print_register_t3
-
+	
+	jal	print_output
 
       	j	interrupt_dispatch
-
 non_intrpt:                            # was some non-interrupt
       li      $v0, 4
       la      $a0, non_intrpt_str
@@ -240,6 +238,57 @@ done:
       jr      $k0
       nop
 
+print_output:
+	sw	$ra, 24($k0)
+
+	la 	$t0, output
+	lw 	$t3, 0($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 4($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 8($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 12($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 16($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 20($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 24($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 28($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 32($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 36($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 40($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 44($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 48($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 52($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 56($t0)
+	jal 	print_register_t3
+	
+	lw	$ra, 24($k0)
+	jr	$ra
 # -----------------------------------------------------------------
 # This is the beginning of the sort and extract function
 # Author: Jack Abernethy
@@ -282,12 +331,117 @@ done:
 
 
 sort_and_extract:
-	la 	$a0, scan_data
 	la	$k0, chunkIH
 	sw	$ra, 24($k0)
+	la 	$a0, scan_data
+	la	$s1, output
+	add	$s0, $a0, $zero		# $s0 = offset
+	
 	jal	sort_list
-	la	$a0, scan_data
+	add	$a0, $s0, $zero
 	jal	compact
+	sw	$v0, 0($s1)
+	
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+
+
 	la	$k0, chunkIH
 	lw	$ra, 24($k0)
 	jr	$ra
