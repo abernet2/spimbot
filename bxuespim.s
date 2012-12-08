@@ -1,12 +1,13 @@
-# -----------------------------------------------------------------
+# -------------------------------------------------------------------------------------
 # This is the SpimBot program created by Jack Abernethy, John McConnell, and Brian Xue.
-#------------------------------------------------------------------
+#--------------------------------------------------------------------------------------
 
 .data
-index:	.word 0
-state: 	.word 0
-output: .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   # output array, 15 x 32 bits 0f 0
-scan_data: .space 16384 		# Memory allocation for scan data
+state: 		.word 0			# state
+next_output:	.word 0
+output: 	.space 60  		# output array, 15 x 32 bits 0f 0
+scan_data: 	.space 16384 		# Memory allocation for scan data
+grid_number:    .word 0			# which grid we're on, 
 
 # euclidean stuff
 three:	.float	3.0
@@ -14,188 +15,337 @@ five:	.float	5.0
 PI:	.float	3.14159
 F180:	.float  180.0
 
-ystring:
-	.word	30	52	30	5	-2	170	-35	0
-xstring:
-	.word	60	30	-30	-30	-30	30	30	30
+map_grid:	.word 0, 29, 0, 29, 0,	 # this is 1th element, grid location is 0(map_grid)
+		.word 0, 29, 30, 59, 0,	 # this is 2th element, grid location is 20(map_grid)
+		.word 0, 29, 60, 89, 0,	 # this is 3th element, grid location is 40(map_grid)
+		.word 0, 29, 90, 119, 0,	 # this is 4th element, grid location is 60(map_grid)
+		.word 0, 29, 120, 149, 0,	 # this is 5th element, grid location is 80(map_grid)
+		.word 0, 29, 150, 179, 0,	 # this is 6th element, grid location is 100(map_grid)
+		.word 0, 29, 180, 209, 0,	 # this is 7th element, grid location is 120(map_grid)
+		.word 0, 29, 210, 239, 0,	 # this is 8th element, grid location is 140(map_grid)
+		.word 0, 29, 240, 269, 0,	 # this is 9th element, grid location is 160(map_grid)
+		.word 0, 29, 270, 299, 0,	 # this is 10th element, grid location is 180(map_grid)
+		###### New Row ######
+		.word 30, 59, 0, 29, 0,	 # this is 11th element, grid location is 200(map_grid)
+		.word 30, 59, 30, 59, 0,	 # this is 12th element, grid location is 220(map_grid)
+		.word 30, 59, 60, 89, 0,	 # this is 13th element, grid location is 240(map_grid)
+		.word 30, 59, 90, 119, 0,	 # this is 14th element, grid location is 260(map_grid)
+		.word 30, 59, 120, 149, 0,	 # this is 15th element, grid location is 280(map_grid)
+		.word 30, 59, 150, 179, 0,	 # this is 16th element, grid location is 300(map_grid)
+		.word 30, 59, 180, 209, 0,	 # this is 17th element, grid location is 320(map_grid)
+		.word 30, 59, 210, 239, 0,	 # this is 18th element, grid location is 340(map_grid)
+		.word 30, 59, 240, 269, 0,	 # this is 19th element, grid location is 360(map_grid)
+		.word 30, 59, 270, 299, 0,	 # this is 20th element, grid location is 380(map_grid)
+		###### New Row ######
+		.word 60, 89, 0, 29, 0,	 # this is 21th element, grid location is 400(map_grid)
+		.word 60, 89, 30, 59, 0,	 # this is 22th element, grid location is 420(map_grid)
+		.word 60, 89, 60, 89, 0,	 # this is 23th element, grid location is 440(map_grid)
+		.word 60, 89, 90, 119, 0,	 # this is 24th element, grid location is 460(map_grid)
+		.word 60, 89, 120, 149, 0,	 # this is 25th element, grid location is 480(map_grid)
+		.word 60, 89, 150, 179, 0,	 # this is 26th element, grid location is 500(map_grid)
+		.word 60, 89, 180, 209, 0,	 # this is 27th element, grid location is 520(map_grid)
+		.word 60, 89, 210, 239, 0,	 # this is 28th element, grid location is 540(map_grid)
+		.word 60, 89, 240, 269, 0,	 # this is 29th element, grid location is 560(map_grid)
+		.word 60, 89, 270, 299, 0,	 # this is 30th element, grid location is 580(map_grid)
+		###### New Row ######
+		.word 90, 119, 0, 29, 0,	 # this is 31th element, grid location is 600(map_grid)
+		.word 90, 119, 30, 59, 0,	 # this is 32th element, grid location is 620(map_grid)
+		.word 90, 119, 60, 89, 0,	 # this is 33th element, grid location is 640(map_grid)
+		.word 90, 119, 90, 119, 0,	 # this is 34th element, grid location is 660(map_grid)
+		.word 90, 119, 120, 149, 0,	 # this is 35th element, grid location is 680(map_grid)
+		.word 90, 119, 150, 179, 0,	 # this is 36th element, grid location is 700(map_grid)
+		.word 90, 119, 180, 209, 0,	 # this is 37th element, grid location is 720(map_grid)
+		.word 90, 119, 210, 239, 0,	 # this is 38th element, grid location is 740(map_grid)
+		.word 90, 119, 240, 269, 0,	 # this is 39th element, grid location is 760(map_grid)
+		.word 90, 119, 270, 299, 0,	 # this is 40th element, grid location is 780(map_grid)
+		###### New Row ######
+		.word 120, 149, 0, 29, 0,	 # this is 41th element, grid location is 800(map_grid)
+		.word 120, 149, 30, 59, 0,	 # this is 42th element, grid location is 820(map_grid)
+		.word 120, 149, 60, 89, 0,	 # this is 43th element, grid location is 840(map_grid)
+		.word 120, 149, 90, 119, 0,	 # this is 44th element, grid location is 860(map_grid)
+		.word 120, 149, 120, 149, 0,	 # this is 45th element, grid location is 880(map_grid)
+		.word 120, 149, 150, 179, 0,	 # this is 46th element, grid location is 900(map_grid)
+		.word 120, 149, 180, 209, 0,	 # this is 47th element, grid location is 920(map_grid)
+		.word 120, 149, 210, 239, 0,	 # this is 48th element, grid location is 940(map_grid)
+		.word 120, 149, 240, 269, 0,	 # this is 49th element, grid location is 960(map_grid)
+		.word 120, 149, 270, 299, 0,	 # this is 50th element, grid location is 980(map_grid)
+		###### New Row ######
+		.word 150, 179, 0, 29, 0,	 # this is 51th element, grid location is 1000(map_grid)
+		.word 150, 179, 30, 59, 0,	 # this is 52th element, grid location is 1020(map_grid)
+		.word 150, 179, 60, 89, 0,	 # this is 53th element, grid location is 1040(map_grid)
+		.word 150, 179, 90, 119, 0,	 # this is 54th element, grid location is 1060(map_grid)
+		.word 150, 179, 120, 149, 0,	 # this is 55th element, grid location is 1080(map_grid)
+		.word 150, 179, 150, 179, 0,	 # this is 56th element, grid location is 1100(map_grid)
+		.word 150, 179, 180, 209, 0,	 # this is 57th element, grid location is 1120(map_grid)
+		.word 150, 179, 210, 239, 0,	 # this is 58th element, grid location is 1140(map_grid)
+		.word 150, 179, 240, 269, 0,	 # this is 59th element, grid location is 1160(map_grid)
+		.word 150, 179, 270, 299, 0,	 # this is 60th element, grid location is 1180(map_grid)
+		###### New Row ######
+		.word 180, 209, 0, 29, 0,	 # this is 61th element, grid location is 1200(map_grid)
+		.word 180, 209, 30, 59, 0,	 # this is 62th element, grid location is 1220(map_grid)
+		.word 180, 209, 60, 89, 0,	 # this is 63th element, grid location is 1240(map_grid)
+		.word 180, 209, 90, 119, 0,	 # this is 64th element, grid location is 1260(map_grid)
+		.word 180, 209, 120, 149, 0,	 # this is 65th element, grid location is 1280(map_grid)
+		.word 180, 209, 150, 179, 0,	 # this is 66th element, grid location is 1300(map_grid)
+		.word 180, 209, 180, 209, 0,	 # this is 67th element, grid location is 1320(map_grid)
+		.word 180, 209, 210, 239, 0,	 # this is 68th element, grid location is 1340(map_grid)
+		.word 180, 209, 240, 269, 0,	 # this is 69th element, grid location is 1360(map_grid)
+		.word 180, 209, 270, 299, 0,	 # this is 70th element, grid location is 1380(map_grid)
+		###### New Row ######
+		.word 210, 239, 0, 29, 0,	 # this is 71th element, grid location is 1400(map_grid)
+		.word 210, 239, 30, 59, 0,	 # this is 72th element, grid location is 1420(map_grid)
+		.word 210, 239, 60, 89, 0,	 # this is 73th element, grid location is 1440(map_grid)
+		.word 210, 239, 90, 119, 0,	 # this is 74th element, grid location is 1460(map_grid)
+		.word 210, 239, 120, 149, 0,	 # this is 75th element, grid location is 1480(map_grid)
+		.word 210, 239, 150, 179, 0,	 # this is 76th element, grid location is 1500(map_grid)
+		.word 210, 239, 180, 209, 0,	 # this is 77th element, grid location is 1520(map_grid)
+		.word 210, 239, 210, 239, 0,	 # this is 78th element, grid location is 1540(map_grid)
+		.word 210, 239, 240, 269, 0,	 # this is 79th element, grid location is 1560(map_grid)
+		.word 210, 239, 270, 299, 0,	 # this is 80th element, grid location is 1580(map_grid)
+		###### New Row ######
+		.word 240, 269, 0, 29, 0,	 # this is 81th element, grid location is 1600(map_grid)
+		.word 240, 269, 30, 59, 0,	 # this is 82th element, grid location is 1620(map_grid)
+		.word 240, 269, 60, 89, 0,	 # this is 83th element, grid location is 1640(map_grid)
+		.word 240, 269, 90, 119, 0,	 # this is 84th element, grid location is 1660(map_grid)
+		.word 240, 269, 120, 149, 0,	 # this is 85th element, grid location is 1680(map_grid)
+		.word 240, 269, 150, 179, 0,	 # this is 86th element, grid location is 1700(map_grid)
+		.word 240, 269, 180, 209, 0,	 # this is 87th element, grid location is 1720(map_grid)
+		.word 240, 269, 210, 239, 0,	 # this is 88th element, grid location is 1740(map_grid)
+		.word 240, 269, 240, 269, 0,	 # this is 89th element, grid location is 1760(map_grid)
+		.word 240, 269, 270, 299, 0,	 # this is 90th element, grid location is 1780(map_grid)
+		###### New Row ######
+		.word 270, 299, 0, 29, 0,	 # this is 91th element, grid location is 1800(map_grid)
+		.word 270, 299, 30, 59, 0,	 # this is 92th element, grid location is 1820(map_grid)
+		.word 270, 299, 60, 89, 0,	 # this is 93th element, grid location is 1840(map_grid)
+		.word 270, 299, 90, 119, 0,	 # this is 94th element, grid location is 1860(map_grid)
+		.word 270, 299, 120, 149, 0,	 # this is 95th element, grid location is 1880(map_grid)
+		.word 270, 299, 150, 179, 0,	 # this is 96th element, grid location is 1900(map_grid)
+		.word 270, 299, 180, 209, 0,	 # this is 97th element, grid location is 1920(map_grid)
+		.word 270, 299, 210, 239, 0,	 # this is 98th element, grid location is 1940(map_grid)
+		.word 270, 299, 240, 269, 0,	 # this is 99th element, grid location is 1960(map_grid)
+		.word 270, 299, 270, 299, 0,	 # this is 100th element, grid location is 1980(map_grid)
+sorted_map_grid:	
+		.word 150, 179, 120, 149, 0,	 # this is 55th element, grid location is 1080(map_grid)
+		.word 150, 179, 150, 179, 0,	 # this is 56th element, grid location is 1100(map_grid)
+		.word 120, 149, 150, 179, 0,	 # this is 46th element, grid location is 900(map_grid)
+		.word 120, 149, 120, 149, 0,	 # this is 45th element, grid location is 880(map_grid)
+		.word 120, 149, 90, 119, 0,	 # this is 44th element, grid location is 860(map_grid)
+		.word 150, 179, 90, 119, 0,	 # this is 54th element, grid location is 1060(map_grid)
+		.word 180, 209, 90, 119, 0,	 # this is 64th element, grid location is 1260(map_grid)
+		.word 180, 209, 120, 149, 0,	 # this is 65th element, grid location is 1280(map_grid)
+		.word 180, 209, 150, 179, 0,	 # this is 66th element, grid location is 1300(map_grid)
+		.word 180, 209, 180, 209, 0,	 # this is 67th element, grid location is 1320(map_grid)
+		.word 150, 179, 180, 209, 0,	 # this is 57th element, grid location is 1120(map_grid)
+		.word 120, 149, 180, 209, 0,	 # this is 47th element, grid location is 920(map_grid)
+		.word 90, 119, 180, 209, 0,	 # this is 37th element, grid location is 720(map_grid)
+		.word 90, 119, 150, 179, 0,	 # this is 36th element, grid location is 700(map_grid)
+		.word 90, 119, 120, 149, 0,	 # this is 35th element, grid location is 680(map_grid)
+		.word 90, 119, 90, 119, 0,	 # this is 34th element, grid location is 660(map_grid)
+		.word 90, 119, 60, 89, 0,	 # this is 33th element, grid location is 640(map_grid)
+		.word 120, 149, 60, 89, 0,	 # this is 43th element, grid location is 840(map_grid)
+		.word 150, 179, 60, 89, 0,	 # this is 53th element, grid location is 1040(map_grid)
+		.word 180, 209, 60, 89, 0,	 # this is 63th element, grid location is 1240(map_grid)
+		.word 210, 239, 60, 89, 0,	 # this is 73th element, grid location is 1440(map_grid)
+		.word 210, 239, 90, 119, 0,	 # this is 74th element, grid location is 1460(map_grid)
+		.word 210, 239, 120, 149, 0,	 # this is 75th element, grid location is 1480(map_grid)
+		.word 210, 239, 150, 179, 0,	 # this is 76th element, grid location is 1500(map_grid)
+		.word 210, 239, 180, 209, 0,	 # this is 77th element, grid location is 1520(map_grid)
+		.word 210, 239, 210, 239, 0,	 # this is 78th element, grid location is 1540(map_grid)
+		.word 180, 209, 210, 239, 0,	 # this is 68th element, grid location is 1340(map_grid)
+		.word 150, 179, 210, 239, 0,	 # this is 58th element, grid location is 1140(map_grid)
+		.word 120, 149, 210, 239, 0,	 # this is 48th element, grid location is 940(map_grid)
+		.word 90, 119, 210, 239, 0,	 # this is 38th element, grid location is 740(map_grid)
+		.word 60, 89, 210, 239, 0,	 # this is 28th element, grid location is 540(map_grid)
+		.word 60, 89, 180, 209, 0,	 # this is 27th element, grid location is 520(map_grid)
+		.word 60, 89, 150, 179, 0,	 # this is 26th element, grid location is 500(map_grid)
+		.word 60, 89, 120, 149, 0,	 # this is 25th element, grid location is 480(map_grid)
+		.word 60, 89, 90, 119, 0,	 # this is 24th element, grid location is 460(map_grid)
+		.word 60, 89, 60, 89, 0,	 # this is 23th element, grid location is 440(map_grid)
+		.word 60, 89, 30, 59, 0,	 # this is 22th element, grid location is 420(map_grid)
+		.word 90, 119, 30, 59, 0,	 # this is 32th element, grid location is 620(map_grid)
+		.word 120, 149, 30, 59, 0,	 # this is 42th element, grid location is 820(map_grid)
+		.word 150, 179, 30, 59, 0,	 # this is 52th element, grid location is 1020(map_grid)
+		.word 180, 209, 30, 59, 0,	 # this is 62th element, grid location is 1220(map_grid)
+		.word 210, 239, 30, 59, 0,	 # this is 72th element, grid location is 1420(map_grid)
+		.word 240, 269, 30, 59, 0,	 # this is 82th element, grid location is 1620(map_grid)
+		.word 240, 269, 60, 89, 0,	 # this is 83th element, grid location is 1640(map_grid)
+		.word 240, 269, 90, 119, 0,	 # this is 84th element, grid location is 1660(map_grid)
+		.word 240, 269, 120, 149, 0,	 # this is 85th element, grid location is 1680(map_grid)
+		.word 240, 269, 150, 179, 0,	 # this is 86th element, grid location is 1700(map_grid)
+		.word 240, 269, 180, 209, 0,	 # this is 87th element, grid location is 1720(map_grid)
+		.word 240, 269, 210, 239, 0,	 # this is 88th element, grid location is 1740(map_grid)
+		.word 240, 269, 240, 269, 0,	 # this is 89th element, grid location is 1760(map_grid)
+		.word 210, 239, 240, 269, 0,	 # this is 79th element, grid location is 1560(map_grid)
+		.word 180, 209, 240, 269, 0,	 # this is 69th element, grid location is 1360(map_grid)
+		.word 150, 179, 240, 269, 0,	 # this is 59th element, grid location is 1160(map_grid)
+		.word 120, 149, 240, 269, 0,	 # this is 49th element, grid location is 960(map_grid)
+		.word 90, 119, 240, 269, 0,	 # this is 39th element, grid location is 760(map_grid)
+		.word 60, 89, 240, 269, 0,	 # this is 29th element, grid location is 560(map_grid)
+		.word 30, 59, 240, 269, 0,	 # this is 19th element, grid location is 360(map_grid)
+		.word 30, 59, 210, 239, 0,	 # this is 18th element, grid location is 340(map_grid)
+		.word 30, 59, 180, 209, 0,	 # this is 17th element, grid location is 320(map_grid)
+		.word 30, 59, 150, 179, 0,	 # this is 16th element, grid location is 300(map_grid)
+		.word 30, 59, 120, 149, 0,	 # this is 15th element, grid location is 280(map_grid)
+		.word 30, 59, 90, 119, 0,	 # this is 14th element, grid location is 260(map_grid)
+		.word 30, 59, 60, 89, 0,	 # this is 13th element, grid location is 240(map_grid)
+		.word 30, 59, 30, 59, 0,	 # this is 12th element, grid location is 220(map_grid)
+		.word 30, 59, 0, 29, 0,	 # this is 11th element, grid location is 200(map_grid)
+		.word 60, 89, 0, 29, 0,	 # this is 21th element, grid location is 400(map_grid)
+		.word 90, 119, 0, 29, 0,	 # this is 31th element, grid location is 600(map_grid)
+		.word 120, 149, 0, 29, 0,	 # this is 41th element, grid location is 800(map_grid)
+		.word 150, 179, 0, 29, 0,	 # this is 51th element, grid location is 1000(map_grid)
+		.word 180, 209, 0, 29, 0,	 # this is 61th element, grid location is 1200(map_grid)
+		.word 210, 239, 0, 29, 0,	 # this is 71th element, grid location is 1400(map_grid)
+		.word 240, 269, 0, 29, 0,	 # this is 81th element, grid location is 1600(map_grid)
+		.word 270, 299, 0, 29, 0,	 # this is 91th element, grid location is 1800(map_grid)
+		.word 270, 299, 30, 59, 0,	 # this is 92th element, grid location is 1820(map_grid)
+		.word 270, 299, 60, 89, 0,	 # this is 93th element, grid location is 1840(map_grid)
+		.word 270, 299, 90, 119, 0,	 # this is 94th element, grid location is 1860(map_grid)
+		.word 270, 299, 120, 149, 0,	 # this is 95th element, grid location is 1880(map_grid)
+		.word 270, 299, 150, 179, 0,	 # this is 96th element, grid location is 1900(map_grid)
+		.word 270, 299, 180, 209, 0,	 # this is 97th element, grid location is 1920(map_grid)
+		.word 270, 299, 210, 239, 0,	 # this is 98th element, grid location is 1940(map_grid)
+		.word 270, 299, 240, 269, 0,	 # this is 99th element, grid location is 1960(map_grid)
+		.word 270, 299, 270, 299, 0,	 # this is 100th element, grid location is 1980(map_grid)
+		.word 240, 269, 270, 299, 0,	 # this is 90th element, grid location is 1780(map_grid)
+		.word 210, 239, 270, 299, 0,	 # this is 80th element, grid location is 1580(map_grid)
+		.word 180, 209, 270, 299, 0,	 # this is 70th element, grid location is 1380(map_grid)
+		.word 150, 179, 270, 299, 0,	 # this is 60th element, grid location is 1180(map_grid)
+		.word 120, 149, 270, 299, 0,	 # this is 50th element, grid location is 980(map_grid)
+		.word 90, 119, 270, 299, 0,	 # this is 40th element, grid location is 780(map_grid)
+		.word 60, 89, 270, 299, 0,	 # this is 30th element, grid location is 580(map_grid)
+		.word 30, 59, 270, 299, 0,	 # this is 20th element, grid location is 380(map_grid)
+		.word 0, 29, 270, 299, 0,	 # this is 10th element, grid location is 180(map_grid)
+		.word 0, 29, 240, 269, 0,	 # this is 9th element, grid location is 160(map_grid)
+		.word 0, 29, 210, 239, 0,	 # this is 8th element, grid location is 140(map_grid)
+		.word 0, 29, 180, 209, 0,	 # this is 7th element, grid location is 120(map_grid)
+		.word 0, 29, 150, 179, 0,	 # this is 6th element, grid location is 100(map_grid)
+		.word 0, 29, 120, 149, 0,	 # this is 5th element, grid location is 80(map_grid)
+		.word 0, 29, 90, 119, 0,	 # this is 4th element, grid location is 60(map_grid)
+		.word 0, 29, 60, 89, 0,	 # this is 3th element, grid location is 40(map_grid)
+		.word 0, 29, 30, 59, 0,	 # this is 2th element, grid location is 20(map_grid)
+		.word 0, 29, 0, 29, 0,	 # this is 1th element, grid location is 0(map_grid)
 
-
+############################################
 .text
 main:
-	sw	$zero,  0xffff0010($0)	#stop the bot
+	sw	$zero,  0xffff0010($0)	# stop the bot
+	la	$t0, state		# load address of state
+	sw	$zero, 0($t0)		# make state == 0
 
-	jal	initialize	# call your initialization function
-				# this should set up interrupt handling;
-				# all of the actual steering, etc. should
-				# be done by the interrupt handler
+	la	$t1, next_output	# load next_output address
+	sw	$t0, 0($t1)		# next_output->state
+
+	jal	initialize		# call your initialization function
+					# this should set up interrupt handling;
+					# all of the actual steering, etc. should
+					# be done by the interrupt handler
 
 infinite:
-	j	infinite	# loop forever (note that interrupts
-				# will still be handled)
+	jal	main_state_dispatcher 	# changes the state to 30 iff state == 0 we can use this to change the state of our machine to behave differently!
+					# I will show an example below, at the end of the scanner interrupt, it store 30 to the value of state
+					# this next function will check if the state is 30, if it is then the machine 'knows' it is ready to move the bot!!!
+	
+j	infinite			# loop forever (note that interrupts
+					# will still be handled)
 
-# ALL your code goes below this line.
-#
-# We will delete EVERYTHING above the line; DO NOT delete the line.
-#
-# ---------------------------------------------------------------------
+main_state_dispatcher:
+	sub	$sp, $sp, 4		# some room for stack
+	sw	$ra, 0($sp)
 
-initialize:
-     	li	$t4, 0xb001                # Or(timer, bonk, scan, global)
+	la	$s0, state		# load address of state
+	lw	$t0, 0($s0)		# load value of state
 
-     	mtc0   	$t4, $12                   # set interrupt mask (Status register)
-     
-                                       # REQUEST TIMER INTERRUPT
-     	lw     	$v0, 0xffff001c($0)        # read current time
-     	add    	$v0, $v0, 100	       # add 100 to current time
-     	sw     	$v0, 0xffff001c($0)        # request timer interrupt in 100000 cycles
-
-      	li      $t0, 0x96		       # this is performing a scan
-      	sw      $t0, 0xffff0050($zero)
-      	sw      $t0, 0xffff0054($zero)
-      	li      $t0, 0xd4
-      	sw      $t0, 0xffff0058($zero)
-      	la      $t0, scan_data
-     	sw      $t0, 0xffff005c($zero)  
+	li	$t1, 0			# put 32 in $t1
+	li	$t2, 30
+	li	$t3, 32
+						# state is moved to 32 on bonks
+	beq	$t0, $t1, state_zero		# if state = 32 move the bot to the next_output 32 means bot is ready to go to next token
+	beq	$t0, $t2, main_move_bot_dis	# if state = 0 goto state_zero this is for bebug purposes only
+	beq	$t0, $t3, sort_and_extract	
+done_dispatch:				# j to this to finish dispatch
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
 
 	jr	$ra
 
-.kdata                 # interrupt handler data (separated just for readability)
-chunkIH:.space 28      # space for 3 registers
+state_zero:				# if the state is zero print 0 to help me
+	# la	$a0, state
+	# li	$a1, 4
+	# jal	print_data_in_memory
+	
+	li	$t0, 5			# have state == 5
+	la	$s0, state		# load address of state
+	sw	$t0, 0($s0)		# load value of state
+	
+	j	done_dispatch
 
-#-----------------------------------------------------------
-# This section is dedicated for strings to be printed by syscall
-# the labels used are defined below
-newline:	  	.asciiz "\n"
-begin_str:		.asciiz "beginning task\n"
-done_str:	  	.asciiz "done with task\n"
-print_reg_v1_str:	.asciiz "Printing register v1: "
-print_reg_a1_str:	.asciiz "Printing register a1: "
-print_reg_a2_str:	.asciiz "Printing register a2: "
-print_reg_a3_str:	.asciiz "Printing register a3: "
-print_reg_t0_str:	.asciiz "Printing register t0: "
-print_reg_t1_str:	.asciiz "Printing register t1: "
-print_reg_t2_str:	.asciiz "Printing register t2: "
-print_reg_t3_str:	.asciiz "Printing register t3: "
-print_reg_t4_str:	.asciiz "Printing register t4: "
-print_reg_t5_str:	.asciiz "Printing register t5: "
-print_reg_t6_str:	.asciiz "Printing register t6: "
-print_reg_t7_str:	.asciiz "Printing register t7: "
-print_reg_t8_str:	.asciiz "Printing register t8: "
-print_reg_t9_str:	.asciiz "Printing register t9: "
-print_reg_s0_str:	.asciiz "Printing register s0: "
-print_reg_s1_str:	.asciiz "Printing register s1: "
-print_reg_s2_str:	.asciiz "Printing register s2: "
-print_reg_s3_str:	.asciiz "Printing register s3: "
-print_reg_s4_str:	.asciiz "Printing register s4: "
-print_reg_s5_str:	.asciiz "Printing register s5: "
-print_reg_s6_str: 	.asciiz "Printing register s6: "
-print_reg_s7_str:	.asciiz "Printing register s7: "
-print_reg_gp_str:	.asciiz "Printing global pointer register: "
-print_reg_sp_str:	.asciiz "Printing stack pointer register: "
-print_reg_fp_str:	.asciiz "Printing frame pointer register: "
-print_reg_ra_str:	.asciiz "Printing return address pointe: "
-timer_intrpt_str: 	.asciiz "time interrupt exception\n"
-scanner_intrpt_str:	.asciiz "scanner interrupt exception\n"
-bonk_intrpt_str:	.asciiz "bonk interrupt exception\n"
-non_intrpt_str:   	.asciiz "Non-interrupt exception\n"
-unhandled_str:    	.asciiz "Unhandled interrupt type\n"
-# End of string sections
-#----------------------------------------------------------
+main_move_bot_dis:
+	la	$s5, next_output	# load the next_output
+	lw	$a0, 0($s5)
+	jal	get_x_y			# get the x and y
 
+	li    	$t1, 300                # Bound of acceptable behavior
+	bgt	$v0, $t1, skip_move	# skip if not in bounds
+	bgt	$v1, $t1, skip_move	# skip if not in bounds
+	
+	move	$a0, $v0		# x into a0
+	move	$a1, $v1		# y into a1
+	jal	main_move_bot
 
-.ktext 0x80000180
-interrupt_handler:
-.set noat
-      move      $k1, $at               # Save $at                               
-.set at
-      la      $k0, chunkIH                
-      sw      $a0, 0($k0)              # Get some free registers                  
-      sw      $a1, 4($k0)              # by storing them to a global variable    
-      sw      $v0, 8($k0)	       # 8($k0) = $v0
+	la	$t0, state		# load state
+	sw	$zero, 0($t0)		# state goes back 0
+skip_move:
+	la	$s5, next_output	
+	lw	$t1, 0($s5)
+	add	$t1, $t1, 4
+	sw	$t1, 0($s5)
 
-      mfc0    $k0, $13                 # Get Cause register                       
-      srl     $a0, $k0, 2                
-      and     $a0, $a0, 0xf            # ExcCode field                            
-      bne     $a0, 0, non_intrpt         
+	j	done_dispatch
+main_move_bot:
+	sub     $sp, $sp, 4
+      	sw      $v0, 0($sp)
 
-interrupt_dispatch:                    # Interrupt:                             
-      mfc0    $k0, $13                 # Get Cause register, again                 
-      beq     $k0, $zero, done         # handled all outstanding interrupts    
+	li     	$t4, 0	
+	sw     	$t4, 0xffff0010($zero)	# set velocity to 10
 
-      				       # add dispatch for other interrupt types here.
-  
-      and     $a0, $k0, 0x1000         # is there a bonk interrupt?                
-      bne     $a0, 0, bonk_interrupt   
+	lw     	$t0, 0xffff0020($zero)  # get_current_x()
+	lw     	$t1, 0xffff0024($zero)  # get_current_y()
 
-      and     $a0, $k0, 0x2000	       # is there a scanner interrupt?
-      bne     $a0, 0, scanner_interrupt
+	sub     $s0, $a0, $t0	       	# get difference in distance from curr_x to token
+	sub     $s1, $a1, $t1	       	# get difference in distance from curr_y to token
+	sub	$sp, $sp, 12
+	sw	$ra, 0($sp)		# save return address on stack
+	sw      $t0, 4($sp)		# saved t0 to stack
+	sw      $t1, 8($sp)		# saved t1 to stack
 
-      and     $a0, $k0, 0x8000         # is there a timer interrupt?
-      bne     $a0, 0, timer_interrupt
+	move	$a0, $s0	    	
+	move	$a1, $s1
+	jal	sb_arctan		# get the angle
+	
+	lw	$ra, 0($sp)		# restore return address on stack
+	lw      $t0, 4($sp)		# restore t0 from stack
+	lw      $t1, 8($sp)		# restore t1 from stack
+	add	$sp, $sp, 12
 
+	sw     	$v0, 0xffff0014($zero)  # set angle to new_angle
+	li     	$t4, 1 
+	sw     	$t4, 0xffff0018($zero)	# set orientation control = 1 (absolute)
 
-      li      $v0, 4                   # Unhandled interrupt types
+	li     	$t4, 10	
+	sw     	$t4, 0xffff0010($zero)	# set velocity to 10
 
-      la      $a0, unhandled_str
-      syscall 
-      j       done
+	lw     	$v0, 0($sp)
+	add	$sp, $sp, 4
+	
+	jr      $ra
 
-bonk_interrupt:
-      sw      $a1, 0xffff0060($zero)   # acknowledge interrupt
-
-      li      $v0, 4
-      la      $a0, bonk_intrpt_str
-      syscall			       #print interrupt handler
-
-      j       interrupt_dispatch       # see if other interrupts are waiting
-
-timer_interrupt:
-      	sw      $a1, 0xffff006c($zero)   # acknowledge interrupt
-
-      	li      $v0, 4
-      	la      $a0, timer_intrpt_str
-      	syscall			       #print interrupt handler
-
-	#li	$t8, 0xffffffff
-	#sw     	$t8, 0xffff001c($zero)	#request time interrupt
-	j      interrupt_dispatch	# see if other interrupts are waiting
-
-scanner_interrupt:
-      	sw      $a1, 0xffff0064($zero)   # acknowledge interrupt
-      
-      	li      $v0, 4
-      	la      $a0, scanner_intrpt_str
-      	syscall			       # print interrupt handler
-
-      	#sw      $ra, 12($k0)             # storing return register
-      
-      	la      $a0, scan_data	       # print scan data address
-      	jal	print_register
-
-      	#jal     sort_and_extract	       # sort and extract
-     	#lw      $ra, 12($k0)	       # load return register
-
-      	j	interrupt_dispatch
-
-non_intrpt:                            # was some non-interrupt
-      li      $v0, 4
-      la      $a0, non_intrpt_str
-      syscall                          # print out an error message
-
-      # fall through to done
-
-done:
-      la      $k0, chunkIH
-      lw      $a0, 0($k0)              # Restore saved registers
-      lw      $a1, 4($k0)
-      lw      $v0, 8($k0)
-      mfc0    $k0, $14                 # Exception Program Counter (PC)
-.set noat
-      move    $at, $k1                 # Restore $at
-.set at 
-      rfe   
-      jr      $k0
-      nop
+get_x_y:
+    	li    	$t0, 0x0000ffff         # Probably check my syntax on this one
+	lw	$t1, 0($a0)
+	and   	$v1, $t0, $t1           # returns 1st 16 bits as y value
+	srl   	$v0, $t1, 16            # shifts right the 32 bits as x value
+	jr	$ra
 
 # -----------------------------------------------------------------
 # This is the beginning of the sort and extract function
@@ -230,55 +380,134 @@ done:
 
 # args(listhead, output array head?);
 #	$a0 == listhead
-sort_and_extract:
-	#move	$t0, $a0		# turns t0 into walker variable
-	addi	$t1, $a0, 112   # t1 == endpoint of loop
-	la	$t2, output		# t2 == head of output super array
-	lw	$t2, 0($t2)
-	sub	$sp, $sp, 16        # since its not recursive, we'll do this before the loops
-	
-big_for_loop:			# start of over-arching for loop
-	beq		$a0, $t1, end_big_loop
-	# save registers (t0, t1, t2, a0)
-	 sw		$a0, 0($sp)
-	 sw		$t1, 4($sp)
-	 sw		$t2, 8($sp)
-	 #sw		$a0, 12($sp)
-	 sw		$ra, 12($sp)
-	#move $a0, $t0
- jal		sort_list
-	# restore registers, but don't fix stack pointer
-	 lw		$a0, 0($sp)
-	 lw		$t2, 8($sp)
-	 lw		$ra, 12($sp)
-	 #move $a0, $t0
-	 li $a1, 32
-	 move $a2, $t2
- jal	 compact		# (head, 32, start of output array)
-	# restore registers
-	 lw		$a0, 0($sp)
-	 lw		$t1, 4($sp)
-	 lw		$t2, 8($sp)
-	 #lw		$a0, 12($sp)
-	 lw		$ra, 12($sp)
-	# increment things
-	 addi	$a0, $a0, 8		# steps to next entry in array
-	 addi	$t2, $t2, 8		# steps to next sub-array of output
-	 
-j	big_for_loop
-	
-end_big_loop:
-	add $sp, $sp, 16
-	j	$ra
-	 
 
-#---------------------------------------------
+#---------------------------------------------------------------
 #	Things needed for sort
-#---------------------------------------------
+#---------------------------------------------------------------
 
-#------------------
-#  Remove Element
-#------------------
+
+sort_and_extract:
+	la 	$a0, scan_data
+	la	$s1, output
+	add	$s0, $a0, $zero		# $s0 = offset
+	
+	jal	sort_list
+	add	$a0, $s0, $zero
+	jal	compact
+	sw	$v0, 0($s1)
+	
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+	addi 	 $s0, $s0, 8
+	move 	 $a0, $s0
+	jal 	 sort_list
+	add 	 $a0, $s0, $zero
+	jal 	 compact
+	addi 	 $s1, $s1, 4
+	sw 	 $v0, 0($s1)
+
+	la	$t0, state		# load state
+	li	$t1, 30	
+	sw	$t1, 0($t0)		# state goes back 0
+
+	la	$a0, output
+	li	$a1, 60
+	jal	print_data_in_memory
+
+	j	done_dispatch
+
+#---------------------------------------------------------------
+#	Things needed for sort
+#---------------------------------------------------------------
 insert_element_after:	
 	# inserts the new element $a0 after $a1
 	# if $a1 is 0, then we insert at the front of the list
@@ -314,6 +543,9 @@ iea_end:
 	jr	$ra			# return
 	# END insert_element_after
 
+#------------------------------------------------------
+#  Remove Element
+#------------------------------------------------------
 remove_element:
 	# removes the element at $a0 (list is in $a1)
 	# if this element is the whole list, we have to empty the list
@@ -350,9 +582,9 @@ re_done:
 	jr	$ra			# return
 	# END remove_element
 	
-#---------
+#--------------------------------------------------------------------------
 #  Sort
-#---------	
+#--------------------------------------------------------------------------
 sort_list:  # $a0 = mylist
 	lw	$t0, 0($a0)  	        # t0 = mylist->head, smallest
 	lw	$t1, 4($a0)  	        # t1 = mylist->tail
@@ -397,441 +629,36 @@ sl_loop_done:
 #	Compact function args(list head, length, base_address of final array)
 #--------------------------------------------
 compact:
-# $a0 = base_address(bool), $a1 = length, $a2 = base_address(word[])
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+	addi	$v0, $zero, 0
+  	li   	$t1, 0x80000000  	# $t1 = mask, initialized to 1 << 31
+	lw	$t2, 0($a0)		# $t2 = list->head
+compact_while:
+	beq	$t2, $zero, return_compact 	# head == zero
+	lw	$t3, 12($t2)		# $t3 = head->value
+	beq	$t3, $zero, compact_value_zero	# if(value == zero)
+	or	$v0, $v0, $t1		#val |= mask
+	j	skip_compact_branch
+compact_value_zero:
+	not	$t0, $t1		# $t0 = ~mask
+	and	$v0, $v0, $t0		# val &= ~mask
+skip_compact_branch:
+  	srl  	$t1, $t1, 1      	# mask = mask >> 1
+	lw	$t2, 8($t2)		# $t2 = head->next
+	j	compact_while
+return_compact:
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
 
-  li   $t0, 0           # $t0 = boolIndex, initialized to 0 
-  li   $t1, 0x80000000  # $t1 = mask, initialized to 1 << 31 
-
-compact_loop:
-  bge  $t0, $a1, compact_done
-
-  lw   $t2, 0($a0)      # $t2 = bool[boolIndex]
-  lw   $t3, 0($a2)      # $t3 = word[wordIndex]
-  beq  $t2, $zero, compact_else_case
-  or   $t3, $t3, $t1    # t3 |= mask
-  j    compact_endif
-
-compact_else_case:
-  not  $t4, $t1         # can re-use $t2 instead of using $t4
-  and  $t3, $t3, $t4    # t3 &= ~mask
-
-compact_endif:
-  sw   $t3, 0($a2)      # word[wordIndex] = t3
-  srl  $t1, $t1, 1      # mask = mask >> 1
-
-  bne  $t1, $zero, compact_loop_maintainance
-  addi $a2, $a2, 4      # advance word array pointer
-  li   $t1, 0x80000000  # reset mask
-
-compact_loop_maintainance:
-  addi $t0, $t0, 1      # increment boolIndex
-  lw   $a0, 8($a0)      # advance walker to walker->next
-  j    compact_loop
-
-compact_done:
-  jr   $ra              # return
 
 # ----------------------------------------------------------
 # This is the end of the sort and extract function
 # ----------------------------------------------------------
 
 
-# ----------------------------------------------------------
-# This next section is dedicated to the functions that belong to the debug environment
-# Author: John McConnell
-# The labels used in this section include
-#	print_all_registers
-#	print_register
-#	print_register_v1
-#	print_register_a1
-#	print_register_a2
-#	print_register_a3
-#	print_register_t0
-#	print_register_t1
-#	print_register_t2
-#	print_register_t3
-#	print_register_t4
-#	print_register_t5
-#	print_register_t6
-#	print_register_t7
-#	print_register_t8
-#	print_register_t9
-#	print_register_s0
-#	print_register_s1
-#	print_register_s2
-#	print_register_s3
-#	print_register_s4
-#	print_register_s5
-#	print_register_s6
-#	print_register_s7
-# It should be noted that registers $a0 and $v0 are not included because they will
-# have to be overwritten in order to be used in syscall
-# ----------------------------------------------------------	
-print_all_registers:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-	jal 	print_register_v1
-	jal	print_register_a1
-	jal	print_register_a2
-	jal	print_register_a3
-	jal	print_register_t0
-	jal	print_register_t1
-	jal	print_register_t2
-	jal	print_register_t3
-	jal	print_register_t4
-	jal	print_register_t5
-	jal	print_register_t6
-	jal	print_register_t7
-	jal	print_register_t8
-	jal	print_register_t9
-	jal	print_register_s0
-	jal	print_register_s1
-	jal	print_register_s2
-	jal	print_register_s3
-	jal	print_register_s4
-	jal	print_register_s5
-	jal	print_register_s6
-	jal	print_register_s7
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
 
-print_register:
-      	li      $v0, 1		# Printer register as int
-      	syscall			# Prints value in $a0
-
-      	li      $v0, 4
-      	la      $a0, newline	# Print a new line
-	syscall
-	jr	$ra
-
-print_register_v1:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li	$v0, 4		# Print introductory string
-      	la      $a0, print_reg_v1_str
-      	syscall
-	move	$a0, $v1
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_a1:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li	$v0, 4		# Print introductory string
-      	la      $a0, print_reg_a1_str
-      	syscall
-
-      	move    $a0, $a1
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_a2:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li	$v0, 4		# Print introductory string
-      	la      $a0, print_reg_a2_str
-      	syscall
-
-      	move    $a0, $a2
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_a3:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-	li	$v0, 4
-	la	$a0, print_reg_a3_str
-	syscall
-
-      	move    $a0, $a3
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-print_register_t0:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_t0_str
-      	syscall
-
-      	move    $a0, $t0
-     	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_t1:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_t1_str
-      	syscall
-
-     	move    $a0, $t1
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_t2:  
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_t2_str
-      	syscall
-
-      	move    $a0, $t2
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_t3:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_t3_str
-      	syscall
-
-      	move    $a0, $t3
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_t4: 
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_t4_str
-      	syscall
-
-      	move    $a0, $t4
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_t5:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_t5_str
-      	syscall
-
-      	move    $a0, $t5
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_t6:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_t6_str
-      	syscall
-
-     	move    $a0, $t6
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_t7:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_t7_str
-      	syscall
-
-      	move    $a0, $t7
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_t8:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_t8_str
-      	syscall
-
-      	move    $a0, $t8
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_t9:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_t9_str
-      	syscall
-
-      	move    $a0, $t9
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_s0:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_s0_str
-      	syscall
-
-      	move    $a0, $s0
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_s1:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-     	la      $a0, print_reg_s1_str
-      	syscall
-
-     	move    $a0, $s1
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_s2:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_s2_str
-     	syscall
-
-      	move    $a0, $s2
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra 
-
-print_register_s3:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_s3_str
-      	syscall
-
-      	move    $a0, $s3
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_s4:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_s4_str
-      	syscall
-
-     	 move    $a0, $s4
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_s5:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_s5_str
-      	syscall
-
-      	move    $a0, $s5
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_s6:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_s6_str
-      	syscall
-
-      	move    $a0, $s6
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
-
-print_register_s7:
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)
-
-      	li      $v0, 4
-      	la      $a0, print_reg_s7_str
-      	syscall
-
-      	move    $a0, $s7
-	jal	print_register
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-	jr	$ra
 
 # ----------------------------------------------------------------
 # Arctan function - Part of the Euclidean Library
@@ -887,37 +714,912 @@ pos_x:
 
 	jr 	$ra
 
-move_bot:				#assume a0, a1 = token location x,y
+# ----------------------------------------------------------
+# This next section is dedicated to the functions that belong to the debug environment
+# Author: John McConnell
+# The labels used in this section include
+# ----------------------------------------------------------
+
+# Print the data of a memory address $a0 = @ of the data, $a1 = size of the data in bytes
+# the function will step by 4 printing data from the memory address until it has stepped $a1 / 4 times
+print_data_in_memory:
+	sub	$sp, $sp, 16
+	sw	$a0, 0($sp)
+	sw	$t0, 4($sp)
+	sw	$t1, 8($sp)
+	sw	$v0, 12($sp)
+	
+	add	$t0, $a0, $a1	# address + offset in bytes
+	sub	$t0, $t0, 4	# subtract 4 because load is 4 offset
+	move	$t1, $a0	# t1 becomes current @
+
+	li	$v0, 4
+	la	$a0, data_memory_print_str
+	syscall
+
+print_data_memory_loop:
+	bgt	$t1, $t0, done_printing_data
+
+	li	$v0, 1		# print variable
+	lw	$a0, 0($t1)
+	syscall
+
+	li	$v0, 4
+	la	$a0, main_comma
+	syscall
+
+	addi	$t1, $t1, 4	
+	j	print_data_memory_loop
+done_printing_data:
+	li	$v0, 4
+	la	$a0, main_newline
+	syscall
+
+	lw	$a0, 0($sp)
+	lw	$t0, 4($sp)
+	lw	$t1, 8($sp)
+	lw	$v0, 12($sp)
+	addi	$sp, $sp, 16
+	jr	$ra
+
+# ALL your code goes below this line.
+#
+# We will delete EVERYTHING above the line; DO NOT delete the line.
+#
+# ---------------------------------------------------------------------
+
+initialize:
+     	li	$t4, 0xb001               	# Or(timer, bonk, scan, global)
+
+     	mtc0   	$t4, $12                   	# set interrupt mask (Status register)
+     
+      	li      $t0, 0x96		       	# this is performing a scan
+      	sw      $t0, 0xffff0050($zero)
+      	sw      $t0, 0xffff0054($zero)
+      	li      $t0, 0xd4
+      	sw      $t0, 0xffff0058($zero)
+      	la      $t0, scan_data
+     	sw      $t0, 0xffff005c($zero)  
+
+	jr	$ra
+
+.kdata                 # interrupt handler data (separated just for readability)
+chunkIH:.space 64      # space for 16 registers
+
+#-----------------------------------------------------------
+# This section is dedicated for strings to be printed by syscall
+# the labels used are defined below
+space:			.asciiz	" "
+newline:	  	.asciiz "\n"
+begin_str:		.asciiz "beginning task\n"
+done_str:	  	.asciiz "done with task\n"
+print_reg_v0_str:	.asciiz "Printing register v0: "
+print_reg_v1_str:	.asciiz "Printing register v1: "
+print_reg_a0_str:	.asciiz "Printing register a0: "
+print_reg_a1_str:	.asciiz "Printing register a1: "
+print_reg_a2_str:	.asciiz "Printing register a2: "
+print_reg_a3_str:	.asciiz "Printing register a3: "
+print_reg_t0_str:	.asciiz "Printing register t0: "
+print_reg_t1_str:	.asciiz "Printing register t1: "
+print_reg_t2_str:	.asciiz "Printing register t2: "
+print_reg_t3_str:	.asciiz "Printing register t3: "
+print_reg_t4_str:	.asciiz "Printing register t4: "
+print_reg_t5_str:	.asciiz "Printing register t5: "
+print_reg_t6_str:	.asciiz "Printing register t6: "
+print_reg_t7_str:	.asciiz "Printing register t7: "
+print_reg_t8_str:	.asciiz "Printing register t8: "
+print_reg_t9_str:	.asciiz "Printing register t9: "
+print_reg_s0_str:	.asciiz "Printing register s0: "
+print_reg_s1_str:	.asciiz "Printing register s1: "
+print_reg_s2_str:	.asciiz "Printing register s2: "
+print_reg_s3_str:	.asciiz "Printing register s3: "
+print_reg_s4_str:	.asciiz "Printing register s4: "
+print_reg_s5_str:	.asciiz "Printing register s5: "
+print_reg_s6_str: 	.asciiz "Printing register s6: "
+print_reg_s7_str:	.asciiz "Printing register s7: "
+print_reg_gp_str:	.asciiz "Printing global pointer register: "
+print_reg_sp_str:	.asciiz "Printing stack pointer register: "
+print_reg_fp_str:	.asciiz "Printing frame pointer register: "
+print_reg_ra_str:	.asciiz "Printing return address pointe: "
+timer_intrpt_str: 	.asciiz "time interrupt exception\n"
+scanner_intrpt_str:	.asciiz "scanner interrupt exception\n"
+bonk_intrpt_str:	.asciiz "bonk interrupt exception\n"
+non_intrpt_str:   	.asciiz "Non-interrupt exception\n"
+unhandled_str:    	.asciiz "Unhandled interrupt type\n"
+# End of string sections
+#----------------------------------------------------------
+
+
+.ktext 0x80000180
+interrupt_handler:
+.set noat
+      	move	$k1, $at               		# Save $at                               
+.set at
+      	la     	$k0, chunkIH                
+      	sw	$a0, 0($k0)             	# Get some free registers                  
+      	sw     	$a1, 4($k0)             	# by storing them to a global variable    
+      	sw    	$t0, 8($k0)	       	
+      	sw	$t1, 12($k0)		
+	sw	$t2, 16($k0)		
+	sw	$t3, 20($k0)		
+	sw	$t4, 24($k0)
+	sw	$t5, 28($k0)
+	sw	$s0, 32($k0)
+	sw	$s1, 36($k0)
+	sw	$s2, 40($k0)
+	sw	$s3, 44($k0)
+	sw	$s4, 48($k0)
+	sw	$s5, 52($k0)
+	sw	$v0, 56($k0)
+	sw	$sp, 60($k0)
+
+      	mfc0    $s0, $13                 	# Get Cause register                       
+      	srl     $t0, $s0, 2                
+      	and     $t0, $t0, 0xf            	# ExcCode field                            
+      	bne     $t0, 0, non_intrpt         
+
+interrupt_dispatch:                    		# Interrupt:                             
+      	mfc0    $s0, $13                 	# Get Cause register, again                 
+      	beq     $s0, $zero, done         	# handled all outstanding interrupts    
+
+      				       		# add dispatch for other interrupt types here.
+  
+      	and     $t0, $s0, 0x1000         	# is there a bonk interrupt?                
+      	bne     $t0, 0, bonk_interrupt   
+
+      	and     $t0, $s0, 0x2000	       	# is there a scanner interrupt?
+      	bne     $t0, 0, scanner_interrupt
+
+     	and     $t0, $s0, 0x8000         	# is there a timer interrupt?
+      	bne     $t0, 0, timer_interrupt
+
+
+      	li      $v0, 4                   	# Unhandled interrupt types $t1 = v0
+      	la      $a0, unhandled_str
+     	syscall 
+
+      	j       done
+
+bonk_interrupt:
+      	sw      $t0, 0xffff0060($zero)   	# acknowledge interrupt
+
+      	li      $v0, 4
+      	la      $a0, bonk_intrpt_str
+      	syscall			       		# print interrupt handler
+
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)      
+
+      	jal     bounce	       			# sort and extract
+
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+
+	la	$v0, state			# make state equal 32
+	li	$t0, 30
+	sw	$t0, state
+
+      	j       interrupt_dispatch       	# see if other interrupts are waiting
+
+timer_interrupt:
+      	sw      $t0, 0xffff006c($zero)  	# acknowledge interrupt
+
+      	li      $v0, 4
+      	la      $a0, timer_intrpt_str
+      	syscall			       		# print interrupt handler
+	
+	#sub 	$sp, $sp, 4
+	#sw	$ra, 4($sp)	
+	#jal 	move_next_grid
+	#lw	$ra, 4($sp)	
+	#add 	$sp, $sp, 4
+
+                                       		# REQUEST TIMER INTERRUPT
+     	# lw     	$v0, 0xffff001c($0)        	# read current time
+     	# add    	$v0, $v0, 1000000	       	# add 100 to current time
+     	# sw     	$v0, 0xffff001c($0)        	# request timer interrupt in 100000 cycles
+
+	# la	$v0, state
+	# li	$t0, 32
+	# sw	$t0, state
+
+	j      	interrupt_dispatch	# see if other interrupts are waiting
+
+scanner_interrupt:
+      	sw      $a1, 0xffff0064($zero)   # acknowledge interrupt
+      
+      	li      $v0, 4
+      	la      $a0, scanner_intrpt_str
+      	syscall			       	# print interrupt handler 
+
+	la	$t0, state		# make state == 32
+	li	$t1, 32
+	sw	$t1, 0($t0)
+
+      	j	interrupt_dispatch
+non_intrpt:                            	# was some non-interrupt
+
+      	li      $v0, 4
+      	la      $a0, non_intrpt_str
+      	syscall                         # print out an error message
+
+      # fall through to done
+
+done:
+      	la      $k0, chunkIH
+      	lw	$a0, 0($k0)             # Restore Saved Registers                  
+      	lw     	$a1, 4($k0)                 
+      	lw    	$t0, 8($k0)	       	
+      	lw	$t1, 12($k0)		
+	lw	$t2, 16($k0)		
+	lw	$t3, 20($k0)		
+	lw	$t4, 24($k0)
+	lw	$t5, 28($k0)
+	lw	$s0, 32($k0)
+	lw	$s1, 36($k0)
+	lw	$s2, 40($k0)
+	lw	$s3, 44($k0)
+	lw	$s4, 48($k0)
+	lw	$s5, 52($k0)
+	lw	$v0, 56($k0)
+	lw	$sp, 60($k0)
+     	mfc0    $k0, $14                 # Exception Program Counter (PC)
+.set noat
+      	move    $at, $k1                 # Restore $at
+.set at 
+      	rfe   
+      	jr      $k0
+      	nop
+
+print_output:
+	sw	$ra, 24($k0)
+
+	la 	$t0, output
+	lw 	$t3, 0($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 4($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 8($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 12($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 16($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 20($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 24($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 28($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 32($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 36($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 40($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 44($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 48($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 52($t0)
+	jal 	print_register_t3
+	la 	$t0, output
+	lw 	$t3, 56($t0)
+	jal 	print_register_t3
+	
+	lw	$ra, 24($k0)
+	jr	$ra
+
+bounce:
 	sub     $sp, $sp, 4
       	sw      $v0, 0($sp)
-
-	lw     	$t0, 0xffff0020($zero)  #get_current_x()
-	lw     	$t1, 0xffff0024($zero)  #get_current_y()
-
-	sub     $s0, $a0, $t0	       	#get difference in distance from curr_x to token
-	sub     $s1, $a1, $t1	       	#get difference in distance from curr_y to token
-	sub	$sp, $sp, 12
-	sw	$ra, 0($sp)		#save return address on stack
-	sw      $t0, 4($sp)		#saved t0 to stack
-	sw      $t1, 8($sp)		#saved t1 to stack
-
-	move	$a0, $s0	    	
-	move	$a1, $s1
-	jal	sb_arctan		#get the angle
 	
-	lw	$ra, 0($sp)		#restore return address on stack
-	lw      $t0, 4($sp)		#restore t0 from stack
-	lw      $t1, 8($sp)		#restore t1 from stack
-	add	$sp, $sp, 12
+	lw	$v0, 0xffff0014($zero)
+	addi	$v0, $v0, 90
+	sw     	$v0, 0xffff0014($zero)  #set angle to new_angle
+	
+	li     	$t4, 0 
+	sw     	$t4, 0xffff0018($zero)	#set orientation control = 1 (absolute)
 
 	li     	$t4, 10	
 	sw     	$t4, 0xffff0010($zero)	#set velocity to 10
-
-	sw     	$v0, 0xffff0014($zero)  #set angle to new_angle
-	li     	$t4, 1 
-	sw     	$t4, 0xffff0018($zero)	#set orientation control = 1 (absolute)
 
 	lw     	$v0, 0($sp)
 	add	$sp, $sp, 4
 	
 	jr      $ra
+
+	
+
+# ----------------------------------------------------------
+# This next section is dedicated to the functions that belong to the debug environment
+# Author: John McConnell
+# The labels used in this section include
+#	print_all_registers
+#	print_register
+#	print_register_v1
+#	print_register_a1
+#	print_register_a2
+#	print_register_a3
+#	print_register_t0
+#	print_register_t1
+#	print_register_t2
+#	print_register_t3
+#	print_register_t4
+#	print_register_t5
+#	print_register_t6
+#	print_register_t7
+#	print_register_t8
+#	print_register_t9
+#	print_register_s0
+#	print_register_s1
+#	print_register_s2
+#	print_register_s3
+#	print_register_s4
+#	print_register_s5
+#	print_register_s6
+#	print_register_s7
+# ----------------------------------------------------------	
+print_all_registers:
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+	jal	print_register_v0
+	jal 	print_register_v1
+	jal	print_register_a0
+	jal	print_register_a1
+	jal	print_register_a2
+	jal	print_register_a3
+	jal	print_register_t0
+	jal	print_register_t1
+	jal	print_register_t2
+	jal	print_register_t3
+	jal	print_register_t4
+	jal	print_register_t5
+	jal	print_register_t6
+	jal	print_register_t7
+	jal	print_register_t8
+	jal	print_register_t9
+	jal	print_register_s0
+	jal	print_register_s1
+	jal	print_register_s2
+	jal	print_register_s3
+	jal	print_register_s4
+	jal	print_register_s5
+	jal	print_register_s6
+	jal	print_register_s7
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
+
+print_register:
+      	li      $v0, 1		# Printer register as int
+      	syscall			# Prints value in $a0
+
+      	li      $v0, 4
+      	la      $a0, newline	# Print a new line
+	syscall
+	jr	$ra
+
+print_register_a0:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_a0_str
+	syscall
+	lw 	$a0, 8($sp)
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_a1:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_a1_str
+	syscall
+	move 	$a0, $a1
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_a2:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_a2_str
+	syscall
+	move 	$a0, $a2
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_a3:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_a3_str
+	syscall
+	move 	$a0, $a3
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_t0:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_t0_str
+	syscall
+	move 	$a0, $t0
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_t1:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_t1_str
+	syscall
+	move 	$a0, $t1
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_t2:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_t2_str
+	syscall
+	move 	$a0, $t2
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_t3:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_t3_str
+	syscall
+	move 	$a0, $t3
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_t4:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_t4_str
+	syscall
+	move 	$a0, $t4
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_t5:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_t5_str
+	syscall
+	move 	$a0, $t5
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_t6:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_t6_str
+	syscall
+	move 	$a0, $t6
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_t7:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_t7_str
+	syscall
+	move 	$a0, $t7
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_t8:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_t8_str
+	syscall
+	move 	$a0, $t8
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_t9:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_t9_str
+	syscall
+	move 	$a0, $t9
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_s0:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_s0_str
+	syscall
+	move 	$a0, $s0
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_s1:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_s1_str
+	syscall
+	move 	$a0, $s1
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_s2:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_s2_str
+	syscall
+	move 	$a0, $s2
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_s3:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_s3_str
+	syscall
+	move 	$a0, $s3
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_s4:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_s4_str
+	syscall
+	move 	$a0, $s4
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_s5:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_s5_str
+	syscall
+	move 	$a0, $s5
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_s6:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_s6_str
+	syscall
+	move 	$a0, $s6
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_s7:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_s7_str
+	syscall
+	move 	$a0, $s7
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_v0:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_v0_str
+	syscall
+	lw 	$a0, 4($sp)
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+print_register_v1:
+	sub 	$sp, $sp, 12 	 # save $a0 and $v0 on stack
+	sw 	$ra, 0($sp)
+	sw 	$v0, 4($sp)
+	sw 	$a0, 8($sp)
+
+	li 	$v0, 4
+	la 	$a0, print_reg_v1_str
+	syscall
+	move 	$a0, $v1
+	jal 	print_register
+
+	lw 	$ra, 0($sp)
+	lw 	$v0, 4($sp)
+	lw 	$a0, 8($sp)
+	add 	$sp, $sp, 12
+	jr 	$ra
+
+###############################
+#Move to next grid
+##############################
+move_center:
+	li	$a0, 150
+	li	$a1, 150
+	jal 	main_move_bot
+	jr	$ra
+move_next_grid:
+	la	$t0, map_grid
+	add	grid_number, grid_number, 20
+	add	$t0, $t0, grid_number	
+ 			
+	lw	$t2, 0($t0)		# gets top_y
+	lw	$t3, 4($t0)		# gets bot_y
+	lw	$t4, 8($t0)		# gets right_x
+	lw	$t5, 12($t0)		# gets left_x
+
+	lw	$t0, 0xffff0020($zero)	#gets bot location x
+	lw	$t1, 0xffff0024($zero)	#gets bot location y
+	
+	add	$a0, $t3, $t2
+	div	$a0, $t5, 2		# gets middle_y of grid
+	add	$a1, $t5, $t4
+	div	$a1, $t6, 2		# gets middle_x of grid
+
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)		# save return address on stack
+	jal	main_move_bot
+	
+	lw	$ra, 0($sp)		# load return address from stack	
+	add	$sp, $sp, 4	
+
+	jr	$ra	
+check_missed_token:			# takes in $a0, $a1 for token_x, token_y
+					# returns $v0, 0 if current position hit, 1 if missed
+	lw	$t0, 0xffff0014($zero)	# gets current angle
+	lw	$t1, 0xffff0020($zero)	# gets current x
+	lw	$t2, 0xffff0024($zero)	# gets current y
+	
+	sub	$t3, $t1, $a0		# gets x diff
+	abs	$t3, $t3		# abs(xdiff)
+	sub	$t4, $t2, $a1		# gets y diff
+	abs	$t4, $t4		# abs(ydiff)
+
+	ble	2, $t3, not_missed
+	ble	2, $t4, not_missed
+	
+missed:
+	li	$v0, 1
+	jr	$ra
+not_missed:
+	li	$v0, 0
+	jr	$ra
+
+check_missed_tokenv2:			# takes in $a0, $a1 for token_x, token_y
+					# checks if bot is heading away from token
+					# returns 0 if bot is still on the right path/is on the token
+					# returns 1 if moving away from token
+
+	lw	$t0, 0xffff0014($zero)	#gets current angle
+	abs	$t0, $t0		#abs(current angle)
+	lw	$t1, 0xffff0020($zero)	#gets current x
+	lw	$t2, 0xffff0024($zero)	#gets current y
+	
+	sub	$t3, $t1, $a0		#gets x diff
+	abs	$t3, $t3		#abs(xdiff)
+	sub	$t4, $t2, $a1		#gets y diff
+	abs	$t4, $t4		#abs(ydiff)
+
+	ble	2, $t3, not_missedv2
+	ble	2, $t4, not_missedv2
+up_left:				#angle between 180, 270	
+	bge	$t0, 270, up_right	#checks which quadrant bot is supposed to be in
+	ble	$t0, 180, bot_right
+	
+	bgt	$t1, $a0, missedv2	#checks if bot is moving away from token
+	bgt	$t2, $a1, missedv2
+up_right:				#angle between 270, 360
+	blt	$t1, $a0, missedv2	#checks if bot is moving away from token
+	bgt	$t2, $a1, missedv2
+bot_right:				#angle between 0, 90
+	bge	$t0, 90, bot_left	#checks which quadrant bot is supposed to be in
+
+	blt	$t1, $a0, missedv2	#checks if bot is moving away from token
+	blt	$t2, $a1, missedv2
+bot_left:				#angle between 90, 180
+	bgt	$t1, $a0, missedv2	#checks if bot is moving away from token
+	blt	$t2, $a1, missedv2
+not_missedv2:
+	li	$v0, 0
+	jr	$ra
+missedv2:
+	li	$v0, 1
+	jr	$ra
+
+
+
+
+
+
