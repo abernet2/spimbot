@@ -3,6 +3,115 @@
 #--------------------------------------------------------------------------------------
 
 .data
+map_grid:	.word 0, 9, 0, 9 0,	 # this is 1th element, grid location is 0(map_grid)
+		.word 0, 9, 4, 13 0,	 # this is 2th element, grid location is 20(map_grid)
+		.word 0, 9, 8, 17 0,	 # this is 3th element, grid location is 40(map_grid)
+		.word 0, 9, 12, 21 0,	 # this is 4th element, grid location is 60(map_grid)
+		.word 0, 9, 16, 25 0,	 # this is 5th element, grid location is 80(map_grid)
+		.word 0, 9, 20, 29 0,	 # this is 6th element, grid location is 100(map_grid)
+		.word 0, 9, 24, 33 0,	 # this is 7th element, grid location is 120(map_grid)
+		.word 0, 9, 28, 37 0,	 # this is 8th element, grid location is 140(map_grid)
+		.word 0, 9, 32, 41 0,	 # this is 9th element, grid location is 160(map_grid)
+		.word 0, 9, 36, 45 0,	 # this is 10th element, grid location is 180(map_grid)
+		###### New Row ######
+		.word 4, 13, 0, 9 0,	 # this is 11th element, grid location is 200(map_grid)
+		.word 4, 13, 4, 13 0,	 # this is 12th element, grid location is 220(map_grid)
+		.word 4, 13, 8, 17 0,	 # this is 13th element, grid location is 240(map_grid)
+		.word 4, 13, 12, 21 0,	 # this is 14th element, grid location is 260(map_grid)
+		.word 4, 13, 16, 25 0,	 # this is 15th element, grid location is 280(map_grid)
+		.word 4, 13, 20, 29 0,	 # this is 16th element, grid location is 300(map_grid)
+		.word 4, 13, 24, 33 0,	 # this is 17th element, grid location is 320(map_grid)
+		.word 4, 13, 28, 37 0,	 # this is 18th element, grid location is 340(map_grid)
+		.word 4, 13, 32, 41 0,	 # this is 19th element, grid location is 360(map_grid)
+		.word 4, 13, 36, 45 0,	 # this is 20th element, grid location is 380(map_grid)
+		###### New Row ######
+		.word 8, 17, 0, 9 0,	 # this is 21th element, grid location is 400(map_grid)
+		.word 8, 17, 4, 13 0,	 # this is 22th element, grid location is 420(map_grid)
+		.word 8, 17, 8, 17 0,	 # this is 23th element, grid location is 440(map_grid)
+		.word 8, 17, 12, 21 0,	 # this is 24th element, grid location is 460(map_grid)
+		.word 8, 17, 16, 25 0,	 # this is 25th element, grid location is 480(map_grid)
+		.word 8, 17, 20, 29 0,	 # this is 26th element, grid location is 500(map_grid)
+		.word 8, 17, 24, 33 0,	 # this is 27th element, grid location is 520(map_grid)
+		.word 8, 17, 28, 37 0,	 # this is 28th element, grid location is 540(map_grid)
+		.word 8, 17, 32, 41 0,	 # this is 29th element, grid location is 560(map_grid)
+		.word 8, 17, 36, 45 0,	 # this is 30th element, grid location is 580(map_grid)
+		###### New Row ######
+		.word 12, 21, 0, 9 0,	 # this is 31th element, grid location is 600(map_grid)
+		.word 12, 21, 4, 13 0,	 # this is 32th element, grid location is 620(map_grid)
+		.word 12, 21, 8, 17 0,	 # this is 33th element, grid location is 640(map_grid)
+		.word 12, 21, 12, 21 0,	 # this is 34th element, grid location is 660(map_grid)
+		.word 12, 21, 16, 25 0,	 # this is 35th element, grid location is 680(map_grid)
+		.word 12, 21, 20, 29 0,	 # this is 36th element, grid location is 700(map_grid)
+		.word 12, 21, 24, 33 0,	 # this is 37th element, grid location is 720(map_grid)
+		.word 12, 21, 28, 37 0,	 # this is 38th element, grid location is 740(map_grid)
+		.word 12, 21, 32, 41 0,	 # this is 39th element, grid location is 760(map_grid)
+		.word 12, 21, 36, 45 0,	 # this is 40th element, grid location is 780(map_grid)
+		###### New Row ######
+		.word 16, 25, 0, 9 0,	 # this is 41th element, grid location is 800(map_grid)
+		.word 16, 25, 4, 13 0,	 # this is 42th element, grid location is 820(map_grid)
+		.word 16, 25, 8, 17 0,	 # this is 43th element, grid location is 840(map_grid)
+		.word 16, 25, 12, 21 0,	 # this is 44th element, grid location is 860(map_grid)
+		.word 16, 25, 16, 25 0,	 # this is 45th element, grid location is 880(map_grid)
+		.word 16, 25, 20, 29 0,	 # this is 46th element, grid location is 900(map_grid)
+		.word 16, 25, 24, 33 0,	 # this is 47th element, grid location is 920(map_grid)
+		.word 16, 25, 28, 37 0,	 # this is 48th element, grid location is 940(map_grid)
+		.word 16, 25, 32, 41 0,	 # this is 49th element, grid location is 960(map_grid)
+		.word 16, 25, 36, 45 0,	 # this is 50th element, grid location is 980(map_grid)
+		###### New Row ######
+		.word 20, 29, 0, 9 0,	 # this is 51th element, grid location is 1000(map_grid)
+		.word 20, 29, 4, 13 0,	 # this is 52th element, grid location is 1020(map_grid)
+		.word 20, 29, 8, 17 0,	 # this is 53th element, grid location is 1040(map_grid)
+		.word 20, 29, 12, 21 0,	 # this is 54th element, grid location is 1060(map_grid)
+		.word 20, 29, 16, 25 0,	 # this is 55th element, grid location is 1080(map_grid)
+		.word 20, 29, 20, 29 0,	 # this is 56th element, grid location is 1100(map_grid)
+		.word 20, 29, 24, 33 0,	 # this is 57th element, grid location is 1120(map_grid)
+		.word 20, 29, 28, 37 0,	 # this is 58th element, grid location is 1140(map_grid)
+		.word 20, 29, 32, 41 0,	 # this is 59th element, grid location is 1160(map_grid)
+		.word 20, 29, 36, 45 0,	 # this is 60th element, grid location is 1180(map_grid)
+		###### New Row ######
+		.word 24, 33, 0, 9 0,	 # this is 61th element, grid location is 1200(map_grid)
+		.word 24, 33, 4, 13 0,	 # this is 62th element, grid location is 1220(map_grid)
+		.word 24, 33, 8, 17 0,	 # this is 63th element, grid location is 1240(map_grid)
+		.word 24, 33, 12, 21 0,	 # this is 64th element, grid location is 1260(map_grid)
+		.word 24, 33, 16, 25 0,	 # this is 65th element, grid location is 1280(map_grid)
+		.word 24, 33, 20, 29 0,	 # this is 66th element, grid location is 1300(map_grid)
+		.word 24, 33, 24, 33 0,	 # this is 67th element, grid location is 1320(map_grid)
+		.word 24, 33, 28, 37 0,	 # this is 68th element, grid location is 1340(map_grid)
+		.word 24, 33, 32, 41 0,	 # this is 69th element, grid location is 1360(map_grid)
+		.word 24, 33, 36, 45 0,	 # this is 70th element, grid location is 1380(map_grid)
+		###### New Row ######
+		.word 28, 37, 0, 9 0,	 # this is 71th element, grid location is 1400(map_grid)
+		.word 28, 37, 4, 13 0,	 # this is 72th element, grid location is 1420(map_grid)
+		.word 28, 37, 8, 17 0,	 # this is 73th element, grid location is 1440(map_grid)
+		.word 28, 37, 12, 21 0,	 # this is 74th element, grid location is 1460(map_grid)
+		.word 28, 37, 16, 25 0,	 # this is 75th element, grid location is 1480(map_grid)
+		.word 28, 37, 20, 29 0,	 # this is 76th element, grid location is 1500(map_grid)
+		.word 28, 37, 24, 33 0,	 # this is 77th element, grid location is 1520(map_grid)
+		.word 28, 37, 28, 37 0,	 # this is 78th element, grid location is 1540(map_grid)
+		.word 28, 37, 32, 41 0,	 # this is 79th element, grid location is 1560(map_grid)
+		.word 28, 37, 36, 45 0,	 # this is 80th element, grid location is 1580(map_grid)
+		###### New Row ######
+		.word 32, 41, 0, 9 0,	 # this is 81th element, grid location is 1600(map_grid)
+		.word 32, 41, 4, 13 0,	 # this is 82th element, grid location is 1620(map_grid)
+		.word 32, 41, 8, 17 0,	 # this is 83th element, grid location is 1640(map_grid)
+		.word 32, 41, 12, 21 0,	 # this is 84th element, grid location is 1660(map_grid)
+		.word 32, 41, 16, 25 0,	 # this is 85th element, grid location is 1680(map_grid)
+		.word 32, 41, 20, 29 0,	 # this is 86th element, grid location is 1700(map_grid)
+		.word 32, 41, 24, 33 0,	 # this is 87th element, grid location is 1720(map_grid)
+		.word 32, 41, 28, 37 0,	 # this is 88th element, grid location is 1740(map_grid)
+		.word 32, 41, 32, 41 0,	 # this is 89th element, grid location is 1760(map_grid)
+		.word 32, 41, 36, 45 0,	 # this is 90th element, grid location is 1780(map_grid)
+		###### New Row ######
+		.word 36, 45, 0, 9 0,	 # this is 91th element, grid location is 1800(map_grid)
+		.word 36, 45, 4, 13 0,	 # this is 92th element, grid location is 1820(map_grid)
+		.word 36, 45, 8, 17 0,	 # this is 93th element, grid location is 1840(map_grid)
+		.word 36, 45, 12, 21 0,	 # this is 94th element, grid location is 1860(map_grid)
+		.word 36, 45, 16, 25 0,	 # this is 95th element, grid location is 1880(map_grid)
+		.word 36, 45, 20, 29 0,	 # this is 96th element, grid location is 1900(map_grid)
+		.word 36, 45, 24, 33 0,	 # this is 97th element, grid location is 1920(map_grid)
+		.word 36, 45, 28, 37 0,	 # this is 98th element, grid location is 1940(map_grid)
+		.word 36, 45, 32, 41 0,	 # this is 99th element, grid location is 1960(map_grid)
+		.word 36, 45, 36, 45 0,	 # this is 100th element, grid location is 1980(map_grid)
 state: 		.word 0			# state
 next_output:	.word 0
 output: 	.space 60  		# output array, 15 x 32 bits 0f 0
@@ -62,9 +171,10 @@ done_dispatch:				# j to this to finish dispatch
 	jr	$ra
 
 state_zero:				# if the state is zero print 0 to help me
-	# la	$a0, state
-	# li	$a1, 4
-	# jal	print_data_in_memory
+	#la	$a0, map_grid
+	#addi	$a0, $a0, 100
+	#li	$a1, 100
+	#jal	print_data_in_memory
 	
 	li	$t0, 5			# have state == 5
 	la	$s0, state		# load address of state
@@ -291,9 +401,9 @@ sort_and_extract:
 	li	$t1, 30	
 	sw	$t1, 0($t0)		# state goes back 0
 
-	la	$a0, output
-	li	$a1, 60
-	jal	print_data_in_memory
+	#la	$a0, output
+	#li	$a1, 60
+	#jal	print_data_in_memory
 
 	j	done_dispatch
 
@@ -576,7 +686,7 @@ initialize:
 	jr	$ra
 
 .kdata                 # interrupt handler data (separated just for readability)
-chunkIH:.space 64      # space for 16 registers
+chunkIH:.space 30      # space for 16 registers
 
 #-----------------------------------------------------------
 # This section is dedicated for strings to be printed by syscall
@@ -622,47 +732,51 @@ unhandled_str:    	.asciiz "Unhandled interrupt type\n"
 #----------------------------------------------------------
 
 
+# ---------------------------------------------------------
+# THE KERNEL
+# USED REGISTERS
+# $t0 = exec tempory
+# $t1 = cause register
+# $t2
+# $k1 == $at DO NOT USE
+# $ra for functions
+# TO BE REMOVED
+# a0 for debug
+# v0 for debug
+# ---------------------------------------------------------
+
 .ktext 0x80000180
 interrupt_handler:
 .set noat
       	move	$k1, $at               		# Save $at                               
 .set at
-      	la     	$k0, chunkIH                
-      	sw	$a0, 0($k0)             	# Get some free registers                  
-      	sw     	$a1, 4($k0)             	# by storing them to a global variable    
-      	sw    	$t0, 8($k0)	       	
-      	sw	$t1, 12($k0)		
-	sw	$t2, 16($k0)		
-	sw	$t3, 20($k0)		
-	sw	$t4, 24($k0)
-	sw	$t5, 28($k0)
-	sw	$s0, 32($k0)
-	sw	$s1, 36($k0)
-	sw	$s2, 40($k0)
-	sw	$s3, 44($k0)
-	sw	$s4, 48($k0)
-	sw	$s5, 52($k0)
-	sw	$v0, 56($k0)
-	sw	$sp, 60($k0)
+      	la     	$k0, chunkIH                	# $k0 is the kernel pointer
+	sw 	$t0, 0($k0)	# saving register $t0
+	sw 	$t1, 4($k0)	# saving register $t1
+	sw 	$t2, 8($k0)	# saving register $t2
+	sw 	$ra, 12($k0)	# saving register $ra
+	sw 	$a0, 16($k0)	# saving register $a0
+	sw 	$v0, 20($k0)	# saving register $v0
 
-      	mfc0    $s0, $13                 	# Get Cause register                       
-      	srl     $t0, $s0, 2                
+
+      	mfc0    $t1, $13                 	# Get Cause register                       
+      	srl     $t0, $t1, 2                
       	and     $t0, $t0, 0xf            	# ExcCode field                            
-      	bne     $t0, 0, non_intrpt         
+      	bne     $t0, $zero, non_intrpt         
 
 interrupt_dispatch:                    		# Interrupt:                             
-      	mfc0    $s0, $13                 	# Get Cause register, again                 
-      	beq     $s0, $zero, done         	# handled all outstanding interrupts    
+      	mfc0    $t1, $13                 	# Get Cause register, again                 
+      	beq     $t1, $zero, done         	# handled all outstanding interrupts    
 
       				       		# add dispatch for other interrupt types here.
   
-      	and     $t0, $s0, 0x1000         	# is there a bonk interrupt?                
+      	and     $t0, $t1, 0x1000         	# is there a bonk interrupt?                
       	bne     $t0, 0, bonk_interrupt   
 
-      	and     $t0, $s0, 0x2000	       	# is there a scanner interrupt?
+      	and     $t0, $t1, 0x2000	       	# is there a scanner interrupt?
       	bne     $t0, 0, scanner_interrupt
 
-     	and     $t0, $s0, 0x8000         	# is there a timer interrupt?
+     	and     $t0, $t1, 0x8000         	# is there a timer interrupt?
       	bne     $t0, 0, timer_interrupt
 
 
@@ -677,19 +791,13 @@ bonk_interrupt:
 
       	li      $v0, 4
       	la      $a0, bonk_intrpt_str
-      	syscall			       		# print interrupt handler
+      	syscall			       		# print interrupt handler     
 
-	sub	$sp, $sp, 4
-	sw	$ra, 0($sp)      
+      	jal     bounce	       			# Bounce
 
-      	jal     bounce	       			# sort and extract
-
-	lw	$ra, 0($sp)
-	add	$sp, $sp, 4
-
-	la	$v0, state			# make state equal 32
+	la	$t1, state			# make state equal 30
 	li	$t0, 30
-	sw	$t0, state
+	sw	$t0, 0($t1)
 
       	j       interrupt_dispatch       	# see if other interrupts are waiting
 
@@ -701,54 +809,44 @@ timer_interrupt:
       	syscall			       		# print interrupt handler
 
                                        		# REQUEST TIMER INTERRUPT
-     	# lw     	$v0, 0xffff001c($0)        	# read current time
-     	# add    	$v0, $v0, 1000000	       	# add 100 to current time
-     	# sw     	$v0, 0xffff001c($0)        	# request timer interrupt in 100000 cycles
+     	# lw     	$v0, 0xffff001c($0)     # read current time
+     	# add    	$v0, $v0, 1000000	# add 100 to current time
+     	# sw     	$v0, 0xffff001c($0)   	# request timer interrupt in 100000 cycles
 
 	# la	$v0, state
 	# li	$t0, 32
 	# sw	$t0, state
 
-	j      	interrupt_dispatch	# see if other interrupts are waiting
+	j      	interrupt_dispatch		# see if other interrupts are waiting
 
 scanner_interrupt:
-      	sw      $a1, 0xffff0064($zero)   # acknowledge interrupt
+      	sw      $a1, 0xffff0064($zero)   	# acknowledge interrupt
       
       	li      $v0, 4
       	la      $a0, scanner_intrpt_str
-      	syscall			       	# print interrupt handler 
+      	syscall			       		# print interrupt handler 
 
-	la	$t0, state		# make state == 32
+	la	$t0, state			# make state == 32
 	li	$t1, 32
 	sw	$t1, 0($t0)
 
       	j	interrupt_dispatch
-non_intrpt:                            	# was some non-interrupt
+non_intrpt:                            		# was some non-interrupt
 
       	li      $v0, 4
       	la      $a0, non_intrpt_str
-      	syscall                         # print out an error message
-
-      # fall through to done
-
+      	syscall                         	# print out an error message
+      	
+	# fall through to done
 done:
-      	la      $k0, chunkIH
-      	lw	$a0, 0($k0)             # Restore Saved Registers                  
-      	lw     	$a1, 4($k0)                 
-      	lw    	$t0, 8($k0)	       	
-      	lw	$t1, 12($k0)		
-	lw	$t2, 16($k0)		
-	lw	$t3, 20($k0)		
-	lw	$t4, 24($k0)
-	lw	$t5, 28($k0)
-	lw	$s0, 32($k0)
-	lw	$s1, 36($k0)
-	lw	$s2, 40($k0)
-	lw	$s3, 44($k0)
-	lw	$s4, 48($k0)
-	lw	$s5, 52($k0)
-	lw	$v0, 56($k0)
-	lw	$sp, 60($k0)
+      	la     	$k0, chunkIH                	# $k0 is the kernel pointer
+	lw 	$t0, 0($k0)	# loading register $t0
+	lw 	$t1, 4($k0)	# loading register $t1
+	lw 	$t2, 8($k0)	# loading register $t2
+	lw 	$ra, 12($k0)	# loading register $ra
+	lw 	$a0, 16($k0)	# loading register $a0
+	lw 	$v0, 20($k0)	# loading register $v0
+
      	mfc0    $k0, $14                 # Exception Program Counter (PC)
 .set noat
       	move    $at, $k1                 # Restore $at
@@ -809,22 +907,16 @@ print_output:
 	lw	$ra, 24($k0)
 	jr	$ra
 
-bounce:
-	sub     $sp, $sp, 4
-      	sw      $v0, 0($sp)
+bounce:	
+	lw	$t0, 0xffff0014($zero)
+	addi	$t0, $t0, 90
+	sw     	$t0, 0xffff0014($zero)  #set angle to new_angle
 	
-	lw	$v0, 0xffff0014($zero)
-	addi	$v0, $v0, 90
-	sw     	$v0, 0xffff0014($zero)  #set angle to new_angle
-	
-	li     	$t4, 0 
-	sw     	$t4, 0xffff0018($zero)	#set orientation control = 1 (absolute)
+	li     	$t0, 0 
+	sw     	$t0, 0xffff0018($zero)	#set orientation control = 1 (absolute)
 
-	li     	$t4, 10	
-	sw     	$t4, 0xffff0010($zero)	#set velocity to 10
-
-	lw     	$v0, 0($sp)
-	add	$sp, $sp, 4
+	li     	$t0, 10	
+	sw     	$t0, 0xffff0010($zero)	#set velocity to 10
 	
 	jr      $ra
 
@@ -1307,4 +1399,5 @@ print_register_v1:
 	lw 	$a0, 8($sp)
 	add 	$sp, $sp, 12
 	jr 	$ra
+
 
