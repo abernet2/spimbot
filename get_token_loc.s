@@ -15,8 +15,8 @@ print_hex    = 0xffff0088    # Prints a hex to the screen
 other_bot_x  = 0xffff00a0    # Other Bot's x coord
 other_bot_y  = 0xffff00a4    # Other Bot's y coord
 
-get_token_loc:                  # get_token_loc(int n, int[] a)
-    li    $t0, 0                # v0 = x, v1 = y
+get_token_loc:                  	# get_token_loc(int n, int[] a)
+    	li    $t0, 0                	# v0 = x, v1 = y
 
 array_search:
 	beq   $a0, $t0, array_found
@@ -25,9 +25,9 @@ array_search:
 	j     array_search
 
 array_found:
-    lw    $a1, 0($a1)             # Loads 32-bit integer into a1
+    	lw    $a1, 0($a1)             # Loads 32-bit integer into a1
 	li    $t1, 300                # Bound of acceptable behavior
-    li    $t0, 0x0000ffff         # Probably check my syntax on this one
+    	li    $t0, 0x0000ffff         # Probably check my syntax on this one
 	li    $t2, 0x80000000         # Sets most significant bit to 1, will AND for invalid values
 x_check:
 	and   $v0, $t0, $a1           # returns 1st 16 bits as x value

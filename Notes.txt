@@ -10,5 +10,44 @@ In the QtSpim/main.ccp calls Robots.h library and spimbotview.h. This file is mo
 [Scanner Functions]
 
 
+[Kernel]
+The Registers the kernel can are any of the ones below if you need more add them yourself and update this page
+      	sw	$a0, 0($k0)             # Get some free registers                  
+      	sw     	$a1, 4($k0)             # by storing them to a global variable    
+      	sw    	$t0, 8($k0)	       	
+      	sw	$t1, 12($k0)		
+	sw	$t2, 16($k0)		
+	sw	$t3, 20($k0)		
+	sw	$t4, 24($k0)
+	sw	$t5, 28($k0)
+	sw	$s0, 32($k0)
+	sw	$s1, 36($k0)
+	sw	$s2, 40($k0)
+	sw	$s3, 44($k0)
+	sw	$s4, 48($k0)
+	sw	$s5, 52($k0)
+	sw	$v0, 56($k0)
+	sw	$sp, 60($k0)
+---------------------------------------------------------------------------------------------------------------
+
+
 
 [Optimizations]
+time interrupt exception
+bonk interrupt exception
+scanner interrupt exception
+Printing register t3: 13172886
+Printing register t3: 2097353
+Printing register t3: 9830540
+Printing register t3: 958264503
+Printing register t3: 826340450
+Printing register t3: 1646257003
+Printing register t3: 1337702340
+Printing register t3: 1263451278
+Printing register t3: 1053989406
+Printing register t3: 203163812
+Printing register t3: 1644861769
+Printing register t3: 682356519
+Printing register t3: 1970324942
+Printing register t3: 319823303
+
