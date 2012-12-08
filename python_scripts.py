@@ -70,7 +70,23 @@ def print_print_functions(all_regs):
         print '\tlw \t$a0, 8($sp)'
         print '\tadd \t$sp, $sp, 12'
         print '\tjr \t$ra'
+def print_load_save_register(regs):
+    x = 0
+    size = len(regs) * 4
+    print '\tsub \t$sp, $sp, '+str(size)+'\t# adjust/substract stackpointer'
+
+    for reg in regs:
+        print '\tsw \t'+reg+', '+str(x)+'($sp)\t# saving register '+reg
+        x = x + 4
+    print ''
+    x = 0
+    for reg in regs:
+        print '\tlw \t'+reg+', '+str(x)+'($sp)\t# loading register '+reg
+        x = x + 4
+    print '\taddi \t$sp, $sp, '+ str(size)+'\t# add/restore stackpointer'
+
 all_regs = print_all_registers()
-print_print_functions(all_regs)
+print_load_save_register(['$t1','$t2'])
+
 
         
