@@ -3,10 +3,10 @@
 #------------------------------------------------------------------
 
 .data
-index:	.word 0
-state: 	.word 0
-output: .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   # output array, 15 x 32 bits 0f 0
-scan_data: .space 16384 		# Memory allocation for scan data
+index:		.word 0
+state: 		.word 0
+output: 	.space 16384  		# output array, 15 x 32 bits 0f 0
+scan_data: 	.space 16384 		# Memory allocation for scan data
 
 # euclidean stuff
 three:	.float	3.0
@@ -40,16 +40,16 @@ infinite:
 # ---------------------------------------------------------------------
 
 initialize:
-     	li	$t4, 0xb001                # Or(timer, bonk, scan, global)
+     	li	$t4, 0xb001               	# Or(timer, bonk, scan, global)
 
-     	mtc0   	$t4, $12                   # set interrupt mask (Status register)
+     	mtc0   	$t4, $12                   	# set interrupt mask (Status register)
      
-                                       # REQUEST TIMER INTERRUPT
-     	lw     	$v0, 0xffff001c($0)        # read current time
-     	add    	$v0, $v0, 100	       # add 100 to current time
-     	sw     	$v0, 0xffff001c($0)        # request timer interrupt in 100000 cycles
+                                       		# REQUEST TIMER INTERRUPT
+     	lw     	$v0, 0xffff001c($0)        	# read current time
+     	add    	$v0, $v0, 100	       		# add 100 to current time
+     	sw     	$v0, 0xffff001c($0)        	# request timer interrupt in 100000 cycles
 
-      	li      $t0, 0x96		       # this is performing a scan
+      	li      $t0, 0x96		       	# this is performing a scan
       	sw      $t0, 0xffff0050($zero)
       	sw      $t0, 0xffff0054($zero)
       	li      $t0, 0xd4
@@ -65,6 +65,7 @@ chunkIH:.space 28      # space for 3 registers
 #-----------------------------------------------------------
 # This section is dedicated for strings to be printed by syscall
 # the labels used are defined below
+space:			.asciiz	" "
 newline:	  	.asciiz "\n"
 begin_str:		.asciiz "beginning task\n"
 done_str:	  	.asciiz "done with task\n"
@@ -208,15 +209,14 @@ scanner_interrupt:
       
       	li      $v0, 4
       	la      $a0, scanner_intrpt_str
-      	syscall			       # print interrupt handler
-
-      	#sw      $ra, 12($k0)             # storing return register
+      	syscall			       	  # print interrupt handler
       
-      	la      $a0, scan_data	       # print scan data address
-      	jal	print_register
+      	la      $a0, scan_data	          # print scan data address
 
-      	#jal     sort_and_extract	       # sort and extract
-     	#lw      $ra, 12($k0)	       # load return register
+      	jal     sort_and_extract	       # sort and extract
+	move	$t3, $v0
+	jal	print_register_t3
+
 
       	j	interrupt_dispatch
 
@@ -273,55 +273,28 @@ done:
 
 # args(listhead, output array head?);
 #	$a0 == listhead
-sort_and_extract:
-	#move	$t0, $a0		# turns t0 into walker variable
-	addi	$t1, $a0, 112   # t1 == endpoint of loop
-	la	$t2, output		# t2 == head of output super array
-	lw	$t2, 0($t2)
-	sub	$sp, $sp, 16        # since its not recursive, we'll do this before the loops
-	
-big_for_loop:			# start of over-arching for loop
-	beq		$a0, $t1, end_big_loop
-	# save registers (t0, t1, t2, a0)
-	 sw		$a0, 0($sp)
-	 sw		$t1, 4($sp)
-	 sw		$t2, 8($sp)
-	 #sw		$a0, 12($sp)
-	 sw		$ra, 12($sp)
-	#move $a0, $t0
- jal		sort_list
-	# restore registers, but don't fix stack pointer
-	 lw		$a0, 0($sp)
-	 lw		$t2, 8($sp)
-	 lw		$ra, 12($sp)
-	 #move $a0, $t0
-	 li $a1, 32
-	 move $a2, $t2
- jal	 compact		# (head, 32, start of output array)
-	# restore registers
-	 lw		$a0, 0($sp)
-	 lw		$t1, 4($sp)
-	 lw		$t2, 8($sp)
-	 #lw		$a0, 12($sp)
-	 lw		$ra, 12($sp)
-	# increment things
-	 addi	$a0, $a0, 8		# steps to next entry in array
-	 addi	$t2, $t2, 8		# steps to next sub-array of output
-	 
-j	big_for_loop
-	
-end_big_loop:
-	add $sp, $sp, 16
-	j	$ra
-	 
 
-#---------------------------------------------
+
+
+#---------------------------------------------------------------
 #	Things needed for sort
-#---------------------------------------------
+#---------------------------------------------------------------
 
-#------------------
-#  Remove Element
-#------------------
+
+sort_and_extract:
+	la 	$a0, scan_data
+	la	$k0, chunkIH
+	sw	$ra, 24($k0)
+	jal	sort_list
+	la	$a0, scan_data
+	jal	compact
+	la	$k0, chunkIH
+	lw	$ra, 24($k0)
+	jr	$ra
+
+#---------------------------------------------------------------
+#	Things needed for sort
+#---------------------------------------------------------------
 insert_element_after:	
 	# inserts the new element $a0 after $a1
 	# if $a1 is 0, then we insert at the front of the list
@@ -357,6 +330,9 @@ iea_end:
 	jr	$ra			# return
 	# END insert_element_after
 
+#------------------------------------------------------
+#  Remove Element
+#------------------------------------------------------
 remove_element:
 	# removes the element at $a0 (list is in $a1)
 	# if this element is the whole list, we have to empty the list
@@ -440,39 +416,29 @@ sl_loop_done:
 #	Compact function args(list head, length, base_address of final array)
 #--------------------------------------------
 compact:
-# $a0 = base_address(bool), $a1 = length, $a2 = base_address(word[])
+	sub	$sp, $sp, 4
+	sw	$ra, 0($sp)
+	addi	$v0, $zero, 0
+  	li   	$t1, 0x80000000  	# $t1 = mask, initialized to 1 << 31
+	lw	$t2, 0($a0)		# $t2 = list->head
+compact_while:
+	beq	$t2, $zero, return_compact 	# head == zero
+	lw	$t3, 12($t2)		# $t3 = head->value
+	beq	$t3, $zero, compact_value_zero	# if(value == zero)
+	or	$v0, $v0, $t1		#val |= mask
+	j	skip_compact_branch
+compact_value_zero:
+	not	$t0, $t1		# $t0 = ~mask
+	and	$v0, $v0, $t0		# val &= ~mask
+skip_compact_branch:
+  	srl  	$t1, $t1, 1      	# mask = mask >> 1
+	lw	$t2, 8($t2)		# $t2 = head->next
+	j	compact_while
+return_compact:
+	lw	$ra, 0($sp)
+	add	$sp, $sp, 4
+	jr	$ra
 
-  li   $t0, 0           # $t0 = boolIndex, initialized to 0 
-  li   $t1, 0x80000000  # $t1 = mask, initialized to 1 << 31 
-
-compact_loop:
-  bge  $t0, $a1, compact_done
-
-  lw   $t2, 0($a0)      # $t2 = bool[boolIndex]
-  lw   $t3, 0($a2)      # $t3 = word[wordIndex]
-  beq  $t2, $zero, compact_else_case
-  or   $t3, $t3, $t1    # t3 |= mask
-  j    compact_endif
-
-compact_else_case:
-  not  $t4, $t1         # can re-use $t2 instead of using $t4
-  and  $t3, $t3, $t4    # t3 &= ~mask
-
-compact_endif:
-  sw   $t3, 0($a2)      # word[wordIndex] = t3
-  srl  $t1, $t1, 1      # mask = mask >> 1
-
-  bne  $t1, $zero, compact_loop_maintainance
-  addi $a2, $a2, 4      # advance word array pointer
-  li   $t1, 0x80000000  # reset mask
-
-compact_loop_maintainance:
-  addi $t0, $t0, 1      # increment boolIndex
-  lw   $a0, 8($a0)      # advance walker to walker->next
-  j    compact_loop
-
-compact_done:
-  jr   $ra              # return
 
 # ----------------------------------------------------------
 # This is the end of the sort and extract function
