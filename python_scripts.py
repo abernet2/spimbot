@@ -12,6 +12,7 @@
 ##	print "\taddi \t $s1, $s1, 4"
 ##	print "\tsw \t $v0, 0($s1)"
 
+
 def print_t_registers():
     regs = []
     for x in range(0,10):
@@ -87,25 +88,69 @@ def print_load_save_register(regs, kernel=False):
         x = x + 4
     print '\taddi \t'+p+', '+p+', '+ str(size)+'\t# add/restore stackpointer'
 def print_grid_data(grid_length):
+    box_array = {}
+    mult = 300 / grid_length
     row_length = 20 * grid_length
     array_size = row_length * grid_length
     count = 0
     string = 'map_grid:'
-    for y in range(0, grid_length * 4, 4):
+    for y in range(0, grid_length):
         print '\t\t###### New Row ######'
-        for x in range(0, grid_length * 4, 4):
-            string += '\t.word '+str(y)
-            string += ', '+str(y+9)
-            string += ', '+str(x)
-            string += ', '+str(x+9)
-            string += ' 0,'
+        for x in range(0, grid_length):
+            string += '\t.word '+str(y * mult)
+            string += ', '+str((y * mult) + (mult - 1))
+            string += ', '+str(x * mult)
+            string += ', '+str((x * mult) + (mult - 1))
+            string += ', 0,'
             string += '\t # this is '+str(count+1)+'th element, grid location is '+str(count * 20)+'(map_grid)'
+            box_array[count+1] = string
             print string
             count = count+1
             string = '\t'
-# all_regs = print_all_registers()
-print_load_save_register(['$t0','$t1','$t2','$ra','$a0','$v0'],True)
-#print_grid_data(10)
+    return box_array
+def sort_grid_data(grid):
+    data = []
+    length = int(len(grid) ** .5)
+    half_length =  length / 2 + length % 2
+    middle_key = ((half_length - 1) * length) + half_length
+    key = middle_key
+    for x in range(2, length + 2, 2):
+        key, r_data = walk(key, length, x, grid)
+        key -= (length + 1)
+        for item in r_data:
+            data.append(item)
+    print 'sorted_map_grid:\t'
+    for string in data:
+        print string
+def walk(key, length, distance, grid):
+    data = []
+    o_key = key
+    for x in range(1, distance):
+        key = key + length
+        data.append(grid[key])
+    for x in range(1, distance):
+        key = key + 1
+        data.append(grid[key])
+    for x in range(1, distance):
+        key = key - length
+        data.append(grid[key])
+    for x in range(1, distance):
+        key = key - 1
+        data.append(grid[key])
+    return o_key, data
+
+def print_grid(length):
+    for x in range(0,length):
+        string = '\t'
+        for y in range(1,length+1):
+            string += str(length * x + y)+','
+        print string
+
+# ll_regs = print_all_registers()
+# print_load_save_register(['$t0','$t1','$t2','$ra','$a0','$v0'],True)
+# sort_grid_data(print_grid_data(10))
+print_grid(10)
+
 
 
         
