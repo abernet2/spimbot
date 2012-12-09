@@ -17,12 +17,12 @@ interrupt_handler:
       	move	$k1, $at               		# Save $at                               
 .set at
       	la     	$k0, chunkIH                	# $k0 is the kernel pointer
-	sw 	$t0, 0($k0)	# saving register $t0
-	sw 	$t1, 4($k0)	# saving register $t1
-	sw 	$t2, 8($k0)	# saving register $t2
-	sw 	$ra, 12($k0)	# saving register $ra
-	sw 	$a0, 16($k0)	# saving register $a0
-	sw 	$v0, 20($k0)	# saving register $v0
+	sw 	$t0, 0($k0)			# saving register $t0
+	sw 	$t1, 4($k0)			# saving register $t1
+	sw 	$t2, 8($k0)			# saving register $t2
+	sw 	$ra, 12($k0)			# saving register $ra
+	sw 	$a0, 16($k0)			# saving register $a0
+	sw 	$v0, 20($k0)			# saving register $v0
 
 
       	mfc0    $t1, $13                 	# Get Cause register                       
