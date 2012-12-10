@@ -216,9 +216,13 @@ sorted_map_grid:
 map_move_head_index:	.word 0
 map_scan_head_index:	.word 0
 state: 			.word 0			# state
+data_ready:		.word 0
+data_valid:		.word 0
+is_scanning:		.word 0
 output_index:		.word 0
 output: 		.space 60  		# output array, 15 x 32 bits 0f 0
 scan_data: 		.space 16384 		# Memory allocation for scan data
+blank:			.space 6000
 next_x_loc:		.word 0
 next_y_loc:		.word 0
 
@@ -243,6 +247,10 @@ main:
 	#la	$t1, sorted_map_move_head
 	#sw	$t0, 0($t1)
 
+	la	$t0, state
+	li	$t1, 4
+	sw	$t1, 0($t0)
+
 	jal	initialize		# call your initialization function
 					# this should set up interrupt handling;
 
@@ -258,8 +266,21 @@ main_state_dispatcher:
 	sub	$sp, $sp, 4		# some room for stack
 	sw	$ra, 0($sp)
 
+	la	$t0, is_scanning
+	lw	$t0, 0($t0)
+	bne	$t0, $zero, skip_perform_scan
+	la	$t0, data_ready
+	lw	$t0, 0($t0)
+	bne	$t0, $zero, skip_perform_scan
+	la	$t0, data_valid
+	lw	$t0, 0($t0)
+	bne	$t0, $zero, skip_perform_scan
+	j	preform_next_scan
+skip_perform_scan:
+
 	la	$s0, state		# load address of state
-	lw	$t0, 0($s0)		# load value of state
+	lw	$t0, 0($s0)		# load value of state	
+
 					# 0 means do nothing
 	li	$t1, 1			# 1 means next output (output_head) is ready to be used and moved
 	li	$t2, 2			# 2 means data is ready to be sorted
@@ -267,8 +288,9 @@ main_state_dispatcher:
 	li	$t4, 4			# 4 means load next grid into next_x_loc, next_y_loc
 	li	$t5, 5			# 5 means move bot to next_x_loc and next_y_loc
 	li	$t6, 6			# 6 means check if bot goes past next_x_loc, next_y_loc
-	li	$t7, 7
+	li	$t7, 7			# 7 means load output to next_x_loc and next_y_loc
 	li	$t8, 8
+	
 						# state is moved to 32 on bonks
 						# if state =  ?? move the bot to the next_output 32 means bot is ready to go to next token
 	#beq	$t0, $t1, main_move_bot_dis	# deprecated needs to be fixed
@@ -374,15 +396,27 @@ preform_next_scan:
 		       				# this is performing a scan
       	sw      $t4, 0xffff0050($zero)		# X center
       	sw      $t3, 0xffff0054($zero)		# Y center
-      	li      $t0, 0x13
+      	li      $t0, 0x14
       	sw      $t0, 0xffff0058($zero)		# radius
       	la      $t0, scan_data
      	sw      $t0, 0xffff005c($zero)  	# memory location
 	
 ran_out_of_grid_2:
-	la	$t0, state			# load address of state
-	sw	$zero, 0($t0)			# set state to zero
+	la	$t0, is_scanning		# load address of state
+	li	$t1, 1
+	sw	$t1, 0($t0)			# set state to zero
 	
+	la	$t0, data_ready
+	sw	$zero, 0($t0)
+
+	la	$t0, data_valid
+	sw	$zero, 0($t0)
+
+	la	$t0, state
+	li	$t1, 4
+	sw	$t1, 0($t0)
+
+
 	j	done_dispatch
 
 ###############################
@@ -412,9 +446,13 @@ load_next_grid:
 	la	$t3, next_x_loc		# store x and y respectively
 	sw	$a0, 0($t2)
 	sw	$a1, 0($t3)
-ran_out_of_grid:
 	la	$t0, state
 	li	$t1, 5
+	sw	$t1, 0($t0)
+	j	done_dispatch
+ran_out_of_grid:
+	la	$t0, state
+	li	$t1, 7
 	sw	$t1, 0($t0)
 
 	j	done_dispatch
@@ -439,20 +477,40 @@ check_if_bot_missed:
 	la	$a1, next_y_loc
 	lw	$a1, 0($a1)
 
+	li    	$t1, 295                # Bound of acceptable behavior
+	bgt	$a0, $t1, hit_location	# skip if not in bounds
+	bgt	$a0, $t1, hit_location	# skip if not in bounds
+	li	$t1, 5
+	ble	$a0, $t1, hit_location
+	ble	$a0, $t1, hit_location
+
+
 	jal	check_missed_tokenv2
 
+	la	$a0, data_valid		# load data ready
+	lw	$a0, 0($a0)		# put_data in a0
 	beq	$v0, 1, missed_location
 	beq	$v0, 2, hit_location
 	j	done_dispatch
-hit_location:
+hit_location:	# a0 = data_ready
+	beq	$a0, $zero, hit_but_no_data
 	li	$t0, 7
 	la	$t1, state
 	sw	$t0, 0($t1)
+	j	done_dispatch
+hit_but_no_data:
+	la	$t0, data_ready
+	sw	$zero, 0($t0)
+	li	$t0, 4
+	la	$t1, state
+	sw	$t0, 0($t1)
+
 	j	done_dispatch
 missed_location:
 	li	$t0, 5
 	la	$t1, state
 	sw	$t0, 0($t1)
+
 	j	done_dispatch
 
 check_missed_tokenv2:			# takes in $a0, $a1 for token_x, token_y
@@ -519,10 +577,17 @@ load_output_2_next_xy:
 
 	jal	get_x_y			# get the x and y, $v0 = x, $v1 = y
 
-	li    	$t1, 300                # Bound of acceptable behavior
+	li    	$t1, 295                # Bound of acceptable behavior
 	bgt	$v0, $t1, skip_load	# skip if not in bounds
 	bgt	$v1, $t1, skip_load	# skip if not in bounds
-	
+	li	$t1, 5
+	ble	$v0, $t1, skip_load
+	ble	$v1, $t1, skip_load
+
+	la	$t0, data_valid
+	li	$t1, 1
+	sw	$t1, 0($t0)
+
 	la	$t0, next_x_loc
 	sw	$v0, 0($t0)
 	la	$t0, next_y_loc
@@ -530,14 +595,36 @@ load_output_2_next_xy:
 	
 	la	$t0, state		# load state
 	li	$t1, 5
-	sw	$t1, 0($t0)		# state goes back 0
+	sw	$t1, 0($t0)		# state goes to 5
+
+	#la	$t0, movement_state
+	#li	$t1, 1
+	#sw	$t1, 0($t0)
+
+	la	$t0, output_index	
+	lw	$t1, 0($t0)
+	add	$t1, $t1, 4
+	sw	$t1, 0($t0)
+
+	j	done_dispatch
 skip_load:
 	la	$t0, output_index	
 	lw	$t1, 0($t0)
 	add	$t1, $t1, 4
 	sw	$t1, 0($t0)
+	j	load_output_2_next_xy
 done_with_output:
-	
+	la	$t0, data_valid		# data is not_ready because it has been used
+	sw	$zero, 0($t0)
+
+	la	$t0, data_ready		# data is not_ready because it has been used
+	sw	$zero, 0($t0)
+
+
+	la	$t0, state		# go load the next grid
+	li	$t1, 4
+	sw	$t1, 0($t0)
+
 	j	done_dispatch
 
 
@@ -688,6 +775,10 @@ sort_and_extract:
 	jal 	 compact
 	addi 	 $s1, $s1, 4
 	sw 	 $v0, 0($s1)
+
+	la	$t0, data_valid
+	li	$t1, 1
+	lw	$t1, 0($t0)
 
 	la	$t0, state		# load state address
 	li	$t1, 7	
@@ -970,10 +1061,14 @@ initialize:
       	li      $t0, 0x96		       	# this is performing a scan
       	sw      $t0, 0xffff0050($zero)
       	sw      $t0, 0xffff0054($zero)
-      	li      $t0, 0xd4
+      	li      $t0, 0x14
       	sw      $t0, 0xffff0058($zero)
       	la      $t0, scan_data
      	sw      $t0, 0xffff005c($zero)  
+
+	la	$t0, is_scanning
+	li	$t1, 1
+	sw	$t1, 0($t0)
 
 	jr	$ra
 
@@ -1114,10 +1209,21 @@ scanner_interrupt:
       	la      $a0, scanner_intrpt_str
       	syscall			       		# print interrupt handler 
 
+	la	$t0, data_ready
+	li	$t1, 1
+	sw	$t1, 0($t0)
+	
+	la	$t0, is_scanning
+	sw	$zero, 0($t0)	
+
+	la	$t0, output_index
+	sw	$zero, 0($t0)
+
 	la	$t0, state			# make state == 32
 	li	$t1, 2
 	sw	$t1, 0($t0)
 
+skip_sort_data:
       	j	interrupt_dispatch
 non_intrpt:                            		# was some non-interrupt
 
@@ -1197,14 +1303,13 @@ print_output:
 
 bounce:	
 	lw	$t0, 0xffff0014($zero)
-	addi	$t0, $t0, 90
+	addi	$t0, $t0, 135
 	sw     	$t0, 0xffff0014($zero)  #set angle to new_angle
 	
 	li     	$t0, 0 
 	sw     	$t0, 0xffff0018($zero)	#set orientation control = 1 (absolute)
-
-	li     	$t0, 10	
-	sw     	$t0, 0xffff0010($zero)	#set velocity to 10
+	
+	sw     	$zero, 0xffff0010($zero)	#set velocity to 10
 	
 	jr      $ra
 
