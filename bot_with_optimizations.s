@@ -213,14 +213,14 @@ sorted_map_grid:
 		.word 0, 29, 60, 89, 0,	 # this is 3th element, grid location is 40(map_grid)
 		.word 0, 29, 30, 59, 0,	 # this is 2th element, grid location is 20(map_grid)
 		.word 0, 29, 0, 29, 0,	 # this is 1th element, grid location is 0(map_grid)
-sorted_map_scan_head:	.word 0
-sorted_map_move_head:	.word 0
-state: 		.word 0			# state
-next_output:	.word 0
-output: 	.space 60  		# output array, 15 x 32 bits 0f 0
-scan_data: 	.space 16384 		# Memory allocation for scan data
-next_x_loc:	.word 150
-next_y_loc:	.word 150
+map_move_head_index:	.word 0
+map_scan_head_index:	.word 0
+state: 			.word 0			# state
+output_index:		.word 0
+output: 		.space 60  		# output array, 15 x 32 bits 0f 0
+scan_data: 		.space 16384 		# Memory allocation for scan data
+next_x_loc:		.word 0
+next_y_loc:		.word 0
 
 data_memory_print_str:	.asciiz "Printing data in memory: "
 main_newline:		.asciiz	"\n"
@@ -237,15 +237,11 @@ F180:	.float  180.0
 main:
 	sw	$zero,  0xffff0010($0)	# stop the bot
 
-	la	$t0, state		# load address of state
-	la	$t1, next_output	# load next_output address
-	sw	$t0, 0($t1)		# next_output->state
-
-	la	$t0, sorted_map_grid	# load sort_map_grid_address
-	la	$t1, sorted_map_scan_head
-	sw	$t0, 0($t1)		# point the head to the start of map_grid_address
-	la	$t1, sorted_map_move_head
-	sw	$t0, 0($t1)
+	#la	$t0, sorted_map_grid	# load sort_map_grid_address
+	#la	$t1, sorted_map_scan_head
+	#sw	$t0, 0($t1)		# point the head to the start of map_grid_address
+	#la	$t1, sorted_map_move_head
+	#sw	$t0, 0($t1)
 
 	jal	initialize		# call your initialization function
 					# this should set up interrupt handling;
@@ -269,8 +265,10 @@ main_state_dispatcher:
 	li	$t2, 2			# 2 means data is ready to be sorted
 	li	$t3, 3			# 3 means data has finished sorting and perform next scam
 	li	$t4, 4			# 4 means load next grid into next_x_loc, next_y_loc
-	li	$t5, 5			# 5 means goto next_x_loc and next_y_loc
+	li	$t5, 5			# 5 means move bot to next_x_loc and next_y_loc
 	li	$t6, 6			# 6 means check if bot goes past next_x_loc, next_y_loc
+	li	$t7, 7
+	li	$t8, 8
 						# state is moved to 32 on bonks
 						# if state =  ?? move the bot to the next_output 32 means bot is ready to go to next token
 	#beq	$t0, $t1, main_move_bot_dis	# deprecated needs to be fixed
@@ -279,6 +277,7 @@ main_state_dispatcher:
 	beq	$t0, $t4, load_next_grid	#
 	beq	$t0, $t5, move_2_next_xy	#
 	beq	$t0, $t6, check_if_bot_missed	#
+	beq	$t0, $t7, load_output_2_next_xy	
 done_dispatch:				# j to this to finish dispatch
 	lw	$ra, 0($sp)
 	add	$sp, $sp, 4
@@ -353,34 +352,34 @@ get_x_y:
 	jr	$ra
 
 preform_next_scan:
-	li	$v0, 1
-	la	$t0, sorted_map_scan_head	# address of head
+	la	$t0, map_scan_head_index	# address of head
 	lw	$t1, 0($t0)			# $t1 address of element
-	
-	lw	$t2, 0($t1)			# grid=>Top
-	lw	$t3, 4($t1)			# grid=>Bot
-	add	$t3, $t3, $t2			# add Bot + Top
+	bgt	$t1, 2000, ran_out_of_grid_2
+	la	$t2, sorted_map_grid
+	add	$t2, $t2, $t1
+ 			
+	lw	$t3, 0($t2)			# gets grid=>top_y
+	lw	$t4, 4($t2)			# gets grid=>bot_y
+
+	add	$t3, $t4, $t3			# add Bot + Top
 	srl	$t3, $t3, 1			# divide by 2
 
-	lw	$t4, 8($t1)			# grid=>Left
-	lw	$t5, 12($t1)			# grid=>Right
-	add	$t5, $t5, $t4			# add Left + Right
-	srl	$t5, $t5, 1			# divide by 2
+	lw	$t4, 8($t2)			# grid=>Left
+	lw	$t5, 12($t2)			# grid=>Right
+	add	$t4, $t5, $t4			# add Left + Right
+	srl	$t4, $t4, 1			# divide by 2
 
 	addi	$t1, $t1, 20			# increment the head by 20 bytes
 	sw	$t1, 0($t0)
 		       				# this is performing a scan
-      	sw      $t5, 0xffff0050($zero)		# X center
+      	sw      $t4, 0xffff0050($zero)		# X center
       	sw      $t3, 0xffff0054($zero)		# Y center
       	li      $t0, 0x13
       	sw      $t0, 0xffff0058($zero)		# radius
       	la      $t0, scan_data
      	sw      $t0, 0xffff005c($zero)  	# memory location
 	
-	#la	$a0, output
-	#li	$a1, 60
-	#jal	print_data_in_memory
-
+ran_out_of_grid_2:
 	la	$t0, state			# load address of state
 	sw	$zero, 0($t0)			# set state to zero
 	
@@ -390,27 +389,30 @@ preform_next_scan:
 #Move to next grid
 ##############################
 load_next_grid:
-	la	$t0, sorted_map_move_head
-	lw	$t1, 0($t0)		# pointer to array_head
+	la	$t0, map_move_head_index
+	lw	$t1, 0($t0)
+	bgt	$t1, 2000, ran_out_of_grid
+	la	$t2, sorted_map_grid
+	add	$t2, $t2, $t1
  			
-	lw	$t2, 0($t1)		# gets top_y
-	lw	$t3, 4($t1)		# gets bot_y
-	lw	$t4, 8($t1)		# gets right_x
-	lw	$t5, 12($t1)		# gets left_x
+	lw	$t3, 0($t2)		# gets top_y
+	lw	$t4, 4($t2)		# gets bot_y
+	lw	$t5, 8($t2)		# gets right_x
+	lw	$t6, 12($t2)		# gets left_x
 	
 	addi	$t1, $t1, 20		# move array_head over 20
 	sw	$t1, 0($t0)		# store array_head in sorted_map_move_head
 	
-	add	$a0, $t3, $t2
+	add	$a0, $t4, $t3
 	srl	$a0, $a0, 1		# gets middle_y of grid
-	add	$a1, $t5, $t4
+	add	$a1, $t6, $t5
 	srl	$a1, $a1, 1		# gets middle_x of grid
 
 	la	$t2, next_y_loc		# load next_x_loc and next_y_loc
 	la	$t3, next_x_loc		# store x and y respectively
 	sw	$a0, 0($t2)
 	sw	$a1, 0($t3)
-	
+ran_out_of_grid:
 	la	$t0, state
 	li	$t1, 5
 	sw	$t1, 0($t0)
@@ -439,15 +441,15 @@ check_if_bot_missed:
 
 	jal	check_missed_tokenv2
 
-	bne	$v0, $zero, missed_location
+	beq	$v0, 1, missed_location
+	beq	$v0, 2, hit_location
+	j	done_dispatch
+hit_location:
+	li	$t0, 7
+	la	$t1, state
+	sw	$t0, 0($t1)
 	j	done_dispatch
 missed_location:
-	li	$t0, 25
-	la	$t1, next_x_loc
-	sw	$t0, 0($t1)
-	la	$t1, next_y_loc
-	sw	$t0, 0($t1)
-
 	li	$t0, 5
 	la	$t1, state
 	sw	$t0, 0($t1)
@@ -455,11 +457,16 @@ missed_location:
 
 check_missed_tokenv2:			# takes in $a0, $a1 for token_x, token_y
 					# checks if bot is heading away from token
-					# returns 0 if bot is still on the right path/is on the token
-					# returns 1 if moving away from token
-
+					# returns 0 if bot is still on the right path
+					# returns 1 if it missed
+					# returns 2 if it hit the token radius
 	lw	$t0, 0xffff0014($zero)	#gets current angle
-	abs	$t0, $t0		#abs(current angle)
+
+	blt	$t0, $zero, add_360	#abs(current angle)
+	j	skip_add_360
+add_360:
+	addi	$t0, 360
+skip_add_360:
 	lw	$t1, 0xffff0020($zero)	#gets current x
 	lw	$t2, 0xffff0024($zero)	#gets current y
 	
@@ -468,33 +475,71 @@ check_missed_tokenv2:			# takes in $a0, $a1 for token_x, token_y
 	sub	$t4, $t2, $a1		#gets y diff
 	abs	$t4, $t4		#abs(ydiff)
 
-	bge	$t3, 3, not_missedv2
-	bge	$t4, 3, not_missedv2
-up_left:				#angle between 180, 270	
+	ble	$t3, 1, check_y
+	j	skip_check_y
+check_y:
+	ble	$t4, 1, token_hit
+skip_check_y:
+	#checking the angle		#angle between 180, 270	
 	bge	$t0, 270, up_right	#checks which quadrant bot is supposed to be in
-	ble	$t0, 180, bot_right
-	
-	bgt	$t1, $a0, missedv2	#checks if bot is moving away from token
+	bge	$t0, 180, up_left
+	bge	$t0, 90, bot_left
+bot_right:
+	bgt	$t1, $a0, missedv2
 	bgt	$t2, $a1, missedv2
-up_right:				#angle between 270, 360
-	blt	$t1, $a0, missedv2	#checks if bot is moving away from token
+	j	not_missedv2
+bot_left:
+	blt	$t1, $a0, missedv2
 	bgt	$t2, $a1, missedv2
-bot_right:				#angle between 0, 90
-	bge	$t0, 90, bot_left	#checks which quadrant bot is supposed to be in
-
-	blt	$t1, $a0, missedv2	#checks if bot is moving away from token
+	j	not_missedv2
+up_left:
+	blt	$t1, $a0, missedv2
 	blt	$t2, $a1, missedv2
-bot_left:				#angle between 90, 180
-	bgt	$t1, $a0, missedv2	#checks if bot is moving away from token
+	j	not_missedv2
+up_right:
+	bgt	$t1, $a0, missedv2
 	blt	$t2, $a1, missedv2
+	j	not_missedv2
 not_missedv2:
 	li	$v0, 0
 	jr	$ra
 missedv2:
 	li	$v0, 1
 	jr	$ra
+token_hit:
+	li	$v0, 2
+	jr	$ra
 
+load_output_2_next_xy:
+	la	$t0, output_index
+	lw	$t1, 0($t0)
+	bge	$t1, 60, done_with_output
+	la	$a0, output		# load the next_output
+	add	$a0, $a0, $t1
+
+	jal	get_x_y			# get the x and y, $v0 = x, $v1 = y
+
+	li    	$t1, 300                # Bound of acceptable behavior
+	bgt	$v0, $t1, skip_load	# skip if not in bounds
+	bgt	$v1, $t1, skip_load	# skip if not in bounds
 	
+	la	$t0, next_x_loc
+	sw	$v0, 0($t0)
+	la	$t0, next_y_loc
+	sw	$v1, 0($t0)
+	
+	la	$t0, state		# load state
+	li	$t1, 5
+	sw	$t1, 0($t0)		# state goes back 0
+skip_load:
+	la	$t0, output_index	
+	lw	$t1, 0($t0)
+	add	$t1, $t1, 4
+	sw	$t1, 0($t0)
+done_with_output:
+	
+	j	done_dispatch
+
 
 # -----------------------------------------------------------------
 # This is the beginning of the sort and extract function
@@ -645,7 +690,7 @@ sort_and_extract:
 	sw 	 $v0, 0($s1)
 
 	la	$t0, state		# load state address
-	li	$t1, 5	
+	li	$t1, 7	
 	sw	$t1, 0($t0)		# state goes back 0
 
 	#la	$a0, output
@@ -1042,10 +1087,6 @@ bonk_interrupt:
 
       	jal     bounce	       			# Bounce
 
-	la	$t1, state			# make state equal 30
-	li	$t0, 5
-	sw	$t0, 0($t1)
-
       	j       interrupt_dispatch       	# see if other interrupts are waiting
 
 timer_interrupt:
@@ -1074,7 +1115,7 @@ scanner_interrupt:
       	syscall			       		# print interrupt handler 
 
 	la	$t0, state			# make state == 32
-	li	$t1, 5
+	li	$t1, 2
 	sw	$t1, 0($t0)
 
       	j	interrupt_dispatch
