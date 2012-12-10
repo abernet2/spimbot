@@ -442,6 +442,14 @@ load_next_grid:
 	add	$a1, $t6, $t5
 	srl	$a1, $a1, 1		# gets middle_x of grid
 
+	li    	$t1, 295                # Bound of acceptable behavior
+	bgt	$a0, $t1, done_dispatch	# skip if not in bounds
+	bgt	$a1, $t1, done_dispatch	# skip if not in bounds
+	li	$t1, 5
+	ble	$a0, $t1, done_dispatch
+	ble	$a1, $t1, done_dispatch
+
+
 	la	$t2, next_y_loc		# load next_x_loc and next_y_loc
 	la	$t3, next_x_loc		# store x and y respectively
 	sw	$a0, 0($t2)
@@ -476,14 +484,6 @@ check_if_bot_missed:
 	lw	$a0, 0($a0)
 	la	$a1, next_y_loc
 	lw	$a1, 0($a1)
-
-	li    	$t1, 295                # Bound of acceptable behavior
-	bgt	$a0, $t1, hit_location	# skip if not in bounds
-	bgt	$a0, $t1, hit_location	# skip if not in bounds
-	li	$t1, 5
-	ble	$a0, $t1, hit_location
-	ble	$a0, $t1, hit_location
-
 
 	jal	check_missed_tokenv2
 
@@ -608,12 +608,15 @@ load_output_2_next_xy:
 
 	j	done_dispatch
 skip_load:
-	la	$t0, output_index	
-	lw	$t1, 0($t0)
-	add	$t1, $t1, 4
-	sw	$t1, 0($t0)
-	j	load_output_2_next_xy
+	#la	$t0, output_index	
+	#lw	$t1, 0($t0)
+	#add	$t1, $t1, 4
+	#sw	$t1, 0($t0)
+	#j	load_output_2_next_xy
 done_with_output:
+	la	$t0, output_index
+	sw	$zero, 0($t0)
+	
 	la	$t0, data_valid		# data is not_ready because it has been used
 	sw	$zero, 0($t0)
 
@@ -676,106 +679,150 @@ sort_and_extract:
 	add	$a0, $s0, $zero
 	jal	compact
 	sw	$v0, 0($s1)
-	
-	addi 	 $s0, $s0, 8
-	move 	 $a0, $s0
-	jal 	 sort_list
-	add 	 $a0, $s0, $zero
-	jal 	 compact
-	addi 	 $s1, $s1, 4
-	sw 	 $v0, 0($s1)
-	addi 	 $s0, $s0, 8
-	move 	 $a0, $s0
-	jal 	 sort_list
-	add 	 $a0, $s0, $zero
-	jal 	 compact
-	addi 	 $s1, $s1, 4
-	sw 	 $v0, 0($s1)
-	addi 	 $s0, $s0, 8
-	move 	 $a0, $s0
-	jal 	 sort_list
-	add 	 $a0, $s0, $zero
-	jal 	 compact
-	addi 	 $s1, $s1, 4
-	sw 	 $v0, 0($s1)
-	addi 	 $s0, $s0, 8
-	move 	 $a0, $s0
-	jal 	 sort_list
-	add 	 $a0, $s0, $zero
-	jal 	 compact
-	addi 	 $s1, $s1, 4
-	sw 	 $v0, 0($s1)
-	addi 	 $s0, $s0, 8
-	move 	 $a0, $s0
-	jal 	 sort_list
-	add 	 $a0, $s0, $zero
-	jal 	 compact
-	addi 	 $s1, $s1, 4
-	sw 	 $v0, 0($s1)
-	addi 	 $s0, $s0, 8
-	move 	 $a0, $s0
-	jal 	 sort_list
-	add 	 $a0, $s0, $zero
-	jal 	 compact
-	addi 	 $s1, $s1, 4
-	sw 	 $v0, 0($s1)
-	addi 	 $s0, $s0, 8
-	move 	 $a0, $s0
-	jal 	 sort_list
-	add 	 $a0, $s0, $zero
-	jal 	 compact
-	addi 	 $s1, $s1, 4
-	sw 	 $v0, 0($s1)
-	addi 	 $s0, $s0, 8
-	move 	 $a0, $s0
-	jal 	 sort_list
-	add 	 $a0, $s0, $zero
-	jal 	 compact
-	addi 	 $s1, $s1, 4
-	sw 	 $v0, 0($s1)
-	addi 	 $s0, $s0, 8
-	move 	 $a0, $s0
-	jal 	 sort_list
-	add 	 $a0, $s0, $zero
-	jal 	 compact
-	addi 	 $s1, $s1, 4
-	sw 	 $v0, 0($s1)
-	addi 	 $s0, $s0, 8
-	move 	 $a0, $s0
-	jal 	 sort_list
-	add 	 $a0, $s0, $zero
-	jal 	 compact
-	addi 	 $s1, $s1, 4
-	sw 	 $v0, 0($s1)
-	addi 	 $s0, $s0, 8
-	move 	 $a0, $s0
-	jal 	 sort_list
-	add 	 $a0, $s0, $zero
-	jal 	 compact
-	addi 	 $s1, $s1, 4
-	sw 	 $v0, 0($s1)
-	addi 	 $s0, $s0, 8
-	move 	 $a0, $s0
-	jal 	 sort_list
-	add 	 $a0, $s0, $zero
-	jal 	 compact
-	addi 	 $s1, $s1, 4
-	sw 	 $v0, 0($s1)
-	addi 	 $s0, $s0, 8
-	move 	 $a0, $s0
-	jal 	 sort_list
-	add 	 $a0, $s0, $zero
-	jal 	 compact
-	addi 	 $s1, $s1, 4
-	sw 	 $v0, 0($s1)
-	addi 	 $s0, $s0, 8
-	move 	 $a0, $s0
-	jal 	 sort_list
-	add 	 $a0, $s0, $zero
-	jal 	 compact
-	addi 	 $s1, $s1, 4
-	sw 	 $v0, 0($s1)
+	jal 	valid_x_y
+	beq 	$v0, $zero, finish_sort_and_extract
 
+	addi 	$s0, $s0, 8
+	move 	$a0, $s0
+	jal 	sort_list
+	add 	$a0, $s0, $zero
+	jal 	compact
+	addi 	$s1, $s1, 4
+	sw 	$v0, 0($s1)
+	jal 	valid_x_y
+	beq 	$v0, $zero, finish_sort_and_extract
+			#Next
+	addi 	$s0, $s0, 8
+	move 	$a0, $s0
+	jal 	sort_list
+	add 	$a0, $s0, $zero
+	jal 	compact
+	addi 	$s1, $s1, 4
+	sw 	$v0, 0($s1)
+	jal 	valid_x_y
+	beq 	$v0, $zero, finish_sort_and_extract
+			#Next
+	addi 	$s0, $s0, 8
+	move 	$a0, $s0
+	jal 	sort_list
+	add 	$a0, $s0, $zero
+	jal 	compact
+	addi 	$s1, $s1, 4
+	sw 	$v0, 0($s1)
+	jal 	valid_x_y
+	beq 	$v0, $zero, finish_sort_and_extract
+			#Next
+	addi 	$s0, $s0, 8
+	move 	$a0, $s0
+	jal 	sort_list
+	add 	$a0, $s0, $zero
+	jal 	compact
+	addi 	$s1, $s1, 4
+	sw 	$v0, 0($s1)
+	jal 	valid_x_y
+	beq 	$v0, $zero, finish_sort_and_extract
+			#Next
+	addi 	$s0, $s0, 8
+	move 	$a0, $s0
+	jal 	sort_list
+	add 	$a0, $s0, $zero
+	jal 	compact
+	addi 	$s1, $s1, 4
+	sw 	$v0, 0($s1)
+	jal 	valid_x_y
+	beq 	$v0, $zero, finish_sort_and_extract
+			#Next
+	addi 	$s0, $s0, 8
+	move 	$a0, $s0
+	jal 	sort_list
+	add 	$a0, $s0, $zero
+	jal 	compact
+	addi 	$s1, $s1, 4
+	sw 	$v0, 0($s1)
+	jal 	valid_x_y
+	beq 	$v0, $zero, finish_sort_and_extract
+			#Next
+	addi 	$s0, $s0, 8
+	move 	$a0, $s0
+	jal 	sort_list
+	add 	$a0, $s0, $zero
+	jal 	compact
+	addi 	$s1, $s1, 4
+	sw 	$v0, 0($s1)
+	jal 	valid_x_y
+	beq 	$v0, $zero, finish_sort_and_extract
+			#Next
+	addi 	$s0, $s0, 8
+	move 	$a0, $s0
+	jal 	sort_list
+	add 	$a0, $s0, $zero
+	jal 	compact
+	addi 	$s1, $s1, 4
+	sw 	$v0, 0($s1)
+	jal 	valid_x_y
+	beq 	$v0, $zero, finish_sort_and_extract
+			#Next
+	addi 	$s0, $s0, 8
+	move 	$a0, $s0
+	jal 	sort_list
+	add 	$a0, $s0, $zero
+	jal 	compact
+	addi 	$s1, $s1, 4
+	sw 	$v0, 0($s1)
+	jal 	valid_x_y
+	beq 	$v0, $zero, finish_sort_and_extract
+			#Next
+	addi 	$s0, $s0, 8
+	move 	$a0, $s0
+	jal 	sort_list
+	add 	$a0, $s0, $zero
+	jal 	compact
+	addi 	$s1, $s1, 4
+	sw 	$v0, 0($s1)
+	jal 	valid_x_y
+	beq 	$v0, $zero, finish_sort_and_extract
+			#Next
+	addi 	$s0, $s0, 8
+	move 	$a0, $s0
+	jal 	sort_list
+	add 	$a0, $s0, $zero
+	jal 	compact
+	addi 	$s1, $s1, 4
+	sw 	$v0, 0($s1)
+	jal 	valid_x_y
+	beq 	$v0, $zero, finish_sort_and_extract
+			#Next
+	addi 	$s0, $s0, 8
+	move 	$a0, $s0
+	jal 	sort_list
+	add 	$a0, $s0, $zero
+	jal 	compact
+	addi 	$s1, $s1, 4
+	sw 	$v0, 0($s1)
+	jal 	valid_x_y
+	beq 	$v0, $zero, finish_sort_and_extract
+			#Next
+	addi 	$s0, $s0, 8
+	move 	$a0, $s0
+	jal 	sort_list
+	add 	$a0, $s0, $zero
+	jal 	compact
+	addi 	$s1, $s1, 4
+	sw 	$v0, 0($s1)
+	jal 	valid_x_y
+	beq 	$v0, $zero, finish_sort_and_extract
+			#Next
+	addi 	$s0, $s0, 8
+	move 	$a0, $s0
+	jal 	sort_list
+	add 	$a0, $s0, $zero
+	jal 	compact
+	addi 	$s1, $s1, 4
+	sw 	$v0, 0($s1)
+	jal 	valid_x_y
+	beq 	$v0, $zero, finish_sort_and_extract
+
+finish_sort_and_extract:
 	la	$t0, data_valid
 	li	$t1, 1
 	lw	$t1, 0($t0)
@@ -789,6 +836,26 @@ sort_and_extract:
 	#jal	print_data_in_memory
 
 	j	done_dispatch
+
+valid_x_y:		#v0 = integer, 1 equals vaild, 0 equals not valid
+    	li    	$t0, 0x0000ffff         # Probably check my syntax on this one
+	move	$t1, $v0
+	and   	$t2, $t0, $t1           # returns 1st 16 bits as y value
+	srl   	$t3, $t1, 16            # shifts right the 32 bits as x value
+	li    	$t1, 295                # Bound of acceptable behavior
+	bgt	$t2, $t1, not_valid_xy	# skip if not in bounds
+	bgt	$t3, $t1, not_valid_xy	# skip if not in bounds
+	li	$t1, 5
+	ble	$t2, $t1, not_valid_xy
+	ble	$t3, $t1, not_valid_xy
+	li	$v0, 1
+	jr	$ra
+not_valid_xy:
+	li	$v0, 0
+
+	jr	$ra
+	
+
 
 #---------------------------------------------------------------
 #	Things needed for sort

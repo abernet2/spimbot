@@ -150,7 +150,7 @@ break_loop:
       addi    $t1, $zero, 1		# t1 = 1
       sw      $t5, 0xffff0014($zero)    # value
       sw      $t1, 0xffff0018($zero)    # set orientation = 1
-      addi    $t1, $zero, 0
+      addi    $t1, $zero, 10
       sw      $t1, 0xffff0010($zero)    # set velocity = 10
       addi    $t1, $zero, 400
       mult    $t1, $t3			# low = 400 * abs(diff)

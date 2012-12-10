@@ -3,15 +3,17 @@
 ##	print "\tlw \t$t3, " + str(x) + "($t0)"
 ##	print "\tjal \tprint_register_t3"
 ##
-##for x in range(0, 112, 8):
-##	print "\taddi \t $s0, $s0, 8"
-##	print "\tmove \t $a0, $s0" 
-##	print "\tjal \t sort_list"
-##	print "\tadd \t $a0, $s0, $zero"
-##	print "\tjal \t compact"
-##	print "\taddi \t $s1, $s1, 4"
-##	print "\tsw \t $v0, 0($s1)"
-
+for x in range(0, 112, 8):
+    print "\taddi \t$s0, $s0, 8"
+    print "\tmove \t$a0, $s0" 
+    print "\tjal \tsort_list"
+    print "\tadd \t$a0, $s0, $zero"
+    print "\tjal \tcompact"
+    print "\taddi \t$s1, $s1, 4"
+    print "\tsw \t$v0, 0($s1)"
+    print"\tjal \tvalid_x_y"
+    print "\tbeq \t$v0, $zero, finish_sort_and_extract"
+    print "\t\t\t#Next"
 
 def print_t_registers():
     regs = []
@@ -206,7 +208,6 @@ tokens = ["983082, 7078068, 16384096, 5963996, 4391182, 2752620, 11796730, 14418
         "101821654, 137167026, 1635391825, 1485169784, 693652610, 577415942, 1760330610, 4474674, 2134303509, 1215662336, 173360142, 1048354711, 1160703534, 1392724103, 1877117327"]
 
 new_tokens = """
-
 scanner interrupt exception
 Printing data in memory: 983082, 7078068, 16384096, 5963996, 4391182, 2752620, 11796730, 14418011, 6291523, 17694735, 9175072, 13172886, 2097353, 9830540, 11796660, 
 scanner interrupt exception
@@ -273,7 +274,9 @@ scanner interrupt exception
 Printing data in memory: 14418011, 1109522202, 281899820, 351646492, 1028633060, 292541063, 278631389, 768045647, 2131885537, 723064204, 616458976, 748320131, 1479622849, 336835283, 845567017, 
 scanner interrupt exception
 """
-check_all_tokens(parse_raw_tokens(new_tokens))
+
+
+#check_all_tokens(parse_raw_tokens(new_tokens))
     
 
 
