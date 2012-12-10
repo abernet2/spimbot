@@ -2,6 +2,8 @@
 index:	.word 0
 state: 	.word 0
 
+space:	.asciiz "\n"
+
 x_coords:
 .word   15	108	250	91	67	
 .word   42	180	220	96	270	
@@ -15,6 +17,83 @@ y_coords:
 	.text
 main:
 	sw	$0,  0xffff0010($0)	#stop the bot
+	
+	li	$v0, 1
+
+	li	$a0, 50
+
+	li	$t0, 30		
+	div	$a0, $t0	# divide x / 30
+	mflo	$a0		# $a0 = x
+	div	$a1, $t0	# divide y / 30
+	mflo	$a1		# $a1 = y
+	li	$t0, 20	
+	mult	$a0, $t0	# x * 20
+	mflo	$a0
+	li	$t0, 200
+	mult	$a1, $t0	# y * 200
+	mflo	$a1
+
+	#syscall
+
+	li	$v0, 4
+	la	$a0, space
+	#syscall
+	li	$v0, 1
+
+	li	$a0, 212
+	li	$t0, 30
+	div	$a0, $t0
+	mflo	$a0
+	li	$t0, 200
+	mult	$a0, $t0
+	mflo	$a0
+	#syscall
+
+	li	$v0, 4
+	la	$a0, space
+	#syscall
+	li	$v0, 1
+
+	li	$a0, 123
+	li	$t0, 30
+	div	$a0, $t0
+	mflo	$a0
+	li	$t0, 200
+	mult	$a0, $t0
+	mflo	$a0
+	#syscall
+
+	li	$v0, 4
+	la	$a0, space
+	#syscall
+	li	$v0, 1
+
+	li	$a0, 1
+	li	$t0, 30
+	div	$a0, $t0
+	mflo	$a0
+	li	$t0, 200
+	mult	$a0, $t0
+	mflo	$a0
+	#syscall
+
+	li	$v0, 4
+	la	$a0, space
+	#syscall
+	li	$v0, 1
+
+	li	$a0, 299
+	li	$t0, 30
+	div	$a0, $t0
+	mflo	$a0
+	li	$t0, 200
+	mult	$a0, $t0
+	mflo	$a0
+	#syscall
+
+
+
 
 	jal	initialize	# call your initialization function
 				# this should set up interrupt handling;
@@ -39,7 +118,7 @@ initialize:
      
                                        # REQUEST TIMER INTERRUPT
      lw     $v0, 0xffff001c($0)        # read current time
-     add    $v0, $v0, 100000           # add 100000 to current time
+     add    $v0, $v0, 1000           # add 100000 to current time
      sw     $v0, 0xffff001c($0)        # request timer interrupt in 100000 cycles
 
 	jr	$ra

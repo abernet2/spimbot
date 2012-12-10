@@ -1,3 +1,5 @@
+import re
+
 ##for x in range(0, 60, 4):
 ##	print "\tla \t$t0, output"
 ##	print "\tlw \t$t3, " + str(x) + "($t0)"
@@ -121,9 +123,10 @@ def sort_grid_data(grid):
         key -= (length + 1)
         for item in r_data:
             data.append(item)
-    print 'sorted_map_grid:\t'
-    for string in data:
-        print string
+    return data
+    #print 'sorted_map_grid:\t'
+    #for string in data:
+        #print string
 def walk(key, length, distance, grid):
     data = []
     o_key = key
@@ -174,11 +177,6 @@ def check_tokens(tokens):
 def check_all_tokens(strings):
     for tokens in strings:
         print check_tokens(tokens)
-    
-# ll_regs = print_all_registers()
-# print_load_save_register(['$t0','$t1','$t2','$ra','$a0','$v0'],True)
-# sort_grid_data(print_grid_data(10))
-# print_grid(10)
 def parse_raw_tokens(tokens):
     data = []
     tokens = tokens.replace("Printing data in memory: ", '|')
@@ -275,7 +273,29 @@ Printing data in memory: 14418011, 1109522202, 281899820, 351646492, 1028633060,
 scanner interrupt exception
 """
 
-
+def filter_data(data):
+    r_data = []
+    p = re.compile('([0-9]*\(map_grid\))')
+    for string in data:
+        find = p.search(string)
+        if find:
+            r_data.append(find.group().replace('(map_grid)','')+',')
+    return r_data
+def print_offset_map(data):
+    print 'sorted_map_offsets:'
+    count = 0
+    line = ''
+    for string in data:
+        line += string
+        count += 1
+        if count == 9:
+            print '\t\t.word\t' + line
+            line = ''
+            count = 0
+# ll_regs = print_all_registers()
+# print_load_save_register(['$t0','$t1','$t2','$ra','$a0','$v0'],True)
+print_offset_map(filter_data(sort_grid_data(print_grid_data(10))))
+# print_grid(10)
 #check_all_tokens(parse_raw_tokens(new_tokens))
     
 

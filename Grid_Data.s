@@ -208,3 +208,63 @@ sorted_map_grid:
 		.word 0, 29, 60, 89, 0,	 # this is 3th element, grid location is 40(map_grid)
 		.word 0, 29, 30, 59, 0,	 # this is 2th element, grid location is 20(map_grid)
 		.word 0, 29, 0, 29, 0,	 # this is 1th element, grid location is 0(map_grid)
+sorted_map_offsets:
+		.word	1080,1100,900,880,860,1060,1260,1280,1300,
+		.word	1320,1120,920,720,700,680,660,640,840,
+		.word	1040,1240,1440,1460,1480,1500,1520,1540,1340,
+		.word	1140,940,740,540,520,500,480,460,440,
+		.word	420,620,820,1020,1220,1420,1620,1640,1660,
+		.word	1680,1700,1720,1740,1760,1560,1360,1160,960,
+		.word	760,560,360,340,320,300,280,260,240,
+		.word	220,200,400,600,800,1000,1200,1400,1600,
+		.word	1800,1820,1840,1860,1880,1900,1920,1940,1960,
+		.word	1980,1780,1580,1380,1180,980,780,580,380,
+		.word	180,160,140,120,100,80,60,40,20,
+
+
+preform_next_scan:
+	la	$t0, map_scan_head_index	# address of head
+	lw	$t1, 0($t0)			# $t1 address of element
+	bgt	$t1, 2000, ran_out_of_grid_2
+	la	$t2, sorted_map_grid
+	add	$t2, $t2, $t1
+ 			
+	lw	$t3, 0($t2)			# gets grid=>top_y
+	lw	$t4, 4($t2)			# gets grid=>bot_y
+
+	add	$t3, $t4, $t3			# add Bot + Top
+	srl	$t3, $t3, 1			# divide by 2
+
+	lw	$t4, 8($t2)			# grid=>Left
+	lw	$t5, 12($t2)			# grid=>Right
+	add	$t4, $t5, $t4			# add Left + Right
+	srl	$t4, $t4, 1			# divide by 2
+
+	addi	$t1, $t1, 20			# increment the head by 20 bytes
+	sw	$t1, 0($t0)
+		       				# this is performing a scan
+      	sw      $t4, 0xffff0050($zero)		# X center
+      	sw      $t3, 0xffff0054($zero)		# Y center
+      	li      $t0, 0x14
+      	sw      $t0, 0xffff0058($zero)		# radius
+      	la      $t0, scan_data
+     	sw      $t0, 0xffff005c($zero)  	# memory location
+	
+ran_out_of_grid_2:
+	la	$t0, is_scanning		# load address of state
+	li	$t1, 1
+	sw	$t1, 0($t0)			# set state to zero
+	
+	la	$t0, data_ready
+	sw	$zero, 0($t0)
+
+	la	$t0, data_valid
+	sw	$zero, 0($t0)
+
+	la	$t0, state
+	li	$t1, 4
+	sw	$t1, 0($t0)
+
+
+	j	done_dispatch
+
