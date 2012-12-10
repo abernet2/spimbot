@@ -6,13 +6,13 @@ import re
 ##	print "\tjal \tprint_register_t3"
 ##
 for x in range(0, 112, 8):
-    print "\taddi \t$s0, $s0, 8"
-    print "\tmove \t$a0, $s0" 
+    print "\taddi \t$t4, $t4, 8"
+    print "\tmove \t$a0, $t4" 
     print "\tjal \tsort_list"
-    print "\tadd \t$a0, $s0, $zero"
+    print "\tadd \t$a0, $t4, $zero"
     print "\tjal \tcompact"
-    print "\taddi \t$s1, $s1, 4"
-    print "\tsw \t$v0, 0($s1)"
+    print "\taddi \t$t5, $t5, 4"
+    print "\tsw \t$v0, 0($t5)"
     print"\tjal \tvalid_x_y"
     print "\tbeq \t$v0, $zero, finish_sort_and_extract"
     print "\t\t\t#Next"
@@ -294,7 +294,7 @@ def print_offset_map(data):
             count = 0
 # ll_regs = print_all_registers()
 # print_load_save_register(['$t0','$t1','$t2','$ra','$a0','$v0'],True)
-print_offset_map(filter_data(sort_grid_data(print_grid_data(10))))
+# print_offset_map(filter_data(sort_grid_data(print_grid_data(10))))
 # print_grid(10)
 #check_all_tokens(parse_raw_tokens(new_tokens))
     
