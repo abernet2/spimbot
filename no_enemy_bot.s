@@ -299,9 +299,6 @@ preform_next_scan:
 
 	addi	$t6, $t6, 4			# increment the head by 4 bytes
 	sw	$t6, 0($t0)
-
-	lw	$t7, 16($t2)			# gets enemy
-	bne	$t7, $zero, preform_next_scan
  			
 	lw	$t3, 0($t2)			# gets grid=>top_y
 	lw	$t4, 4($t2)			# gets grid=>bot_y
@@ -359,9 +356,6 @@ load_next_grid:
 	addi	$t6, $t6, 4			# increment the head by 4 bytes
 	sw	$t6, 0($t0)
  
-	lw	$t7, 16($t2)		# get the enemy
-	bne	$t7, $zero, load_next_grid	# oh no the enemy
-	
 	lw	$t3, 0($t2)		# gets top_y
 	lw	$t4, 4($t2)		# gets bot_y
 	lw	$t5, 8($t2)		# gets right_x
@@ -373,10 +367,10 @@ load_next_grid:
 	add	$a1, $t6, $t5
 	srl	$a1, $a1, 1		# gets middle_x of grid
 
-	li    	$t1, 298                # Bound of acceptable behavior
+	li    	$t1, 295                # Bound of acceptable behavior
 	bgt	$a0, $t1, done_dispatch	# skip if not in bounds
 	bgt	$a1, $t1, done_dispatch	# skip if not in bounds
-	li	$t1, 2
+	li	$t1, 5
 	ble	$a0, $t1, done_dispatch
 	ble	$a1, $t1, done_dispatch
 
@@ -411,24 +405,24 @@ move_2_next_xy:
 	j	done_dispatch
 
 check_if_bot_missed:	# add opponent location first
-	lw	$a0, 0xffff00a0($zero)	# opponent x
-	lw	$a1, 0xffff00a4($zero)	# opponent y
-	li	$t0, 30		
-	div	$a0, $t0	# divide x / 30
-	mflo	$a0		# $a0 = x
-	div	$a1, $t0	# divide y / 30
-	mflo	$a1		# $a1 = y
-	li	$t0, 20	
-	mult	$a0, $t0	# x * 20
-	mflo	$a0
-	li	$t0, 200
-	mult	$a1, $t0	# y * 200
-	mflo	$a1
+	#lw	$a0, 0xffff00a0($zero)	# opponent x
+	#lw	$a1, 0xffff00a4($zero)	# opponent y
+	#li	$t0, 30		
+	#div	$a0, $t0	# divide x / 30
+	#mflo	$a0		# $a0 = x
+	#div	$a1, $t0	# divide y / 30
+	#mflo	$a1		# $a1 = y
+	#li	$t0, 20	
+	#mult	$a0, $t0	# x * 20
+	#mflo	$a0
+	#li	$t0, 200
+	#mult	$a1, $t0	# y * 200
+	#mflo	$a1
 
-	add	$a0, $a0, $a1	# add x offset + y offset
-	la	$t0, map_grid
-	add	$a0, $a0, $t0
-	sw	$a0, 16($a0) 
+	#add	$a0, $a0, $a1	# add x offset + y offset
+	#la	$t0, map_grid
+	#add	$a0, $a0, $t0
+	#sw	$a0, 16($a0) 
 
 
 	la	$a0, next_x_loc
@@ -528,10 +522,10 @@ load_output_2_next_xy:
 
 	jal	get_x_y			# get the x and y, $v0 = x, $v1 = y
 
-	li    	$t1, 298                # Bound of acceptable behavior
+	li    	$t1, 295                # Bound of acceptable behavior
 	bgt	$v0, $t1, skip_load	# skip if not in bounds
 	bgt	$v1, $t1, skip_load	# skip if not in bounds
-	li	$t1, 2
+	li	$t1, 5
 	ble	$v0, $t1, skip_load
 	ble	$v1, $t1, skip_load
 
@@ -793,10 +787,10 @@ valid_x_y:		#v0 = integer, 1 equals vaild, 0 equals not valid
 	move	$t1, $v0
 	and   	$t2, $t0, $t1           # returns 1st 16 bits as y value
 	srl   	$t3, $t1, 16            # shifts right the 32 bits as x value
-	li    	$t1, 298                # Bound of acceptable behavior
+	li    	$t1, 295                # Bound of acceptable behavior
 	bgt	$t2, $t1, not_valid_xy	# skip if not in bounds
 	bgt	$t3, $t1, not_valid_xy	# skip if not in bounds
-	li	$t1, 2
+	li	$t1, 5
 	ble	$t2, $t1, not_valid_xy
 	ble	$t3, $t1, not_valid_xy
 	li	$v0, 1
@@ -1810,5 +1804,6 @@ print_register_v1:
 	lw 	$a0, 8($sp)
 	add 	$sp, $sp, 12
 	jr 	$ra
+
 
 
