@@ -118,7 +118,7 @@ initialize:
      
                                        # REQUEST TIMER INTERRUPT
      lw     $v0, 0xffff001c($0)        # read current time
-     add    $v0, $v0, 1000           # add 100000 to current time
+     add    $v0, $v0, 1           # add 100000 to current time
      sw     $v0, 0xffff001c($0)        # request timer interrupt in 100000 cycles
 
 	jr	$ra
@@ -135,16 +135,16 @@ interrupt_handler:
       move      $k1, $at               # Save $at                               
 .set at
       la      $k0, chunkIH                
-      sw      $a0, 0($k0)              # Get some free registers                  
-      sw      $a1, 4($k0)              # by storing them to a global variable    
-      sw      $v0, 8($k0)	       # 8($k0) = $v0
-      sw      $t0, 12($k0)	       # 12($k0) = $t0
-      sw      $t1, 16($k0)	       # 16($k0) = $t1
-      sw      $t2, 20($k0)
-      sw      $t3, 24($k0)
-      sw      $t4, 28($k0)
-      sw      $t5, 32($k0)
-      sw      $t6, 36($k0)      
+      #sw      $a0, 0($k0)              # Get some free registers                  
+      #sw      $a1, 4($k0)              # by storing them to a global variable    
+      #sw      $v0, 8($k0)	       # 8($k0) = $v0
+      #sw      $t0, 12($k0)	       # 12($k0) = $t0
+      #sw      $t1, 16($k0)	       # 16($k0) = $t1
+      #sw      $t2, 20($k0)
+      #sw      $t3, 24($k0)
+      #sw      $t4, 28($k0)
+      #sw      $t5, 32($k0)
+      #sw      $t6, 36($k0)      
 
       mfc0    $k0, $13                 # Get Cause register                       
       srl     $a0, $k0, 2                
@@ -248,16 +248,16 @@ non_intrpt:                            # was some non-interrupt
 
 done:
       la      $k0, chunkIH
-      lw      $a0, 0($k0)              # Restore saved registers
-      lw      $a1, 4($k0)
-      lw      $v0, 8($k0)
-      lw      $t0, 12($k0)
-      lw      $t1, 16($k0)
-      lw      $t2, 20($k0)
-      lw      $t3, 24($k0)
-      lw      $t4, 28($k0)
-      lw      $t5, 32($k0)
-      lw      $t6, 36($k0)
+      #lw      $a0, 0($k0)              # Restore saved registers
+      #lw      $a1, 4($k0)
+      #lw      $v0, 8($k0)
+      #lw      $t0, 12($k0)
+      #lw      $t1, 16($k0)
+      #lw      $t2, 20($k0)
+      #lw      $t3, 24($k0)
+      #lw      $t4, 28($k0)
+      #lw      $t5, 32($k0)
+      #lw      $t6, 36($k0)
       mfc0    $k0, $14                 # Exception Program Counter (PC)
 .set noat
       move    $at, $k1                 # Restore $at

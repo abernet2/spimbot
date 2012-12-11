@@ -788,7 +788,7 @@ finish_sort_and_extract:
 	lw	$t1, 0($t0)
 
 	#la	$t0, state		# load state address
-	li	$s0, 3
+	li	$s0, 7
 	#sw	$t1, 0($t0)		# state goes back 0
 
 	#la	$a0, output
@@ -1209,6 +1209,7 @@ bounce:
 	jr      $ra
 
 	
+
 
 
 

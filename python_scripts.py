@@ -6,15 +6,17 @@ import re
 ##	print "\tjal \tprint_register_t3"
 ##
 for x in range(0, 112, 8):
-    print "\taddi \t$t4, $t4, 8"
-    print "\tmove \t$a0, $t4" 
+    print "\tmove \t$a0, $s3 \t# a0 = scan + offset" 
     print "\tjal \tsort_list"
-    print "\tadd \t$a0, $t4, $zero"
-    print "\tjal \tcompact"
-    print "\taddi \t$t5, $t5, 4"
-    print "\tsw \t$v0, 0($t5)"
-    print"\tjal \tvalid_x_y"
-    print "\tbeq \t$v0, $zero, finish_sort_and_extract"
+    print "\tmove \t$a0, $s3 \t# a0 = scan + offset" 
+    print "\tjal \tcompact \t# Compact the value"
+    print "\tjal \tvalid_x_y"
+    print "\tbeq \t$v1, $zero, finish_sort_and_extract \t# End if not valid"
+    print "\tadd \t$t6, $t5, $s1"
+    print "\tsw \t$v0, 0($t6) \t# Store compact value in Output"      
+    print "\taddi \t$s3, $s3, 8 \t# increment the In_offset"
+    print "\taddi \t$s1, $s1, 4 \t# Offset the Output"
+    print "\tmove \t$a0, $s3 \t# move scan_data back to $a0"
     print "\t\t\t#Next"
 
 def print_t_registers():
